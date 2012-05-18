@@ -1,0 +1,72 @@
+
+CREATE TABLE IF NOT EXISTS `index` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `index` varchar(10) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`)
+) 
+
+CREATE TABLE IF NOT EXISTS `unternehmen` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(30) NOT NULL UNIQUE,
+  `kuerzel` char(10) NOT NULL UNIQUE,
+  `ISIN` char(20) NOT NULL UNIQUE,
+  `index` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  Foreign Key (`index`) references `index`(`id`)
+) 
+
+CREATE TABLE IF NOT EXISTS `kursdaten` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `unternehmen` INT NOT NULL,
+  `datum` date NOT NULL,
+  `open` float NOT NULL,
+  `close` float NOT NULL,
+  `volume` int(11) NOT NULL,
+  `amount_change` float NOT NULL,
+  `percent_change` float NOT NULL,
+  PRIMARY KEY (`id`),
+  Foreign Key (`unternehmen`) references `unternehmen`(`id`)  ON DELETE CASCADE
+) 
+
+CREATE TABLE IF NOT EXISTS `einstuffung` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `wert` varchar(10) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`)
+) 
+
+CREATE TABLE IF NOT EXISTS `analystenhaus` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`)
+) 
+
+CREATE TABLE IF NOT EXISTS `analyst` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `analystenhaus` INT NOT NULL,
+  `mae` float,
+  `mse` float,
+  
+  PRIMARY KEY (`id`),
+  UNIQUE(`name`,`analystenhaus`),
+  Foreign Key (`analystenhaus`) references `analystenhaus`(`id`) ON DELETE CASCADE
+) 
+
+CREATE TABLE IF NOT EXISTS `prognose` (
+  `unternehmen` INT NOT NULL,
+  `analyst` INT,
+  `datum` date NOT NULL DEFAULT '0000-00-00',
+  `zieldatum` date NOT NULL,
+  `zeithorizont` int(11) NOT NULL DEFAULT '0',
+  `neues_kursziel` float NOT NULL DEFAULT '0',
+  `altes_kursziel` float NOT NULL DEFAULT '0',
+  `neue_einstufung` INT ,
+  `alte_einstufung` INT ,
+  `kurs_bei_veroeffentlichung` float NOT NULL DEFAULT '0',
+  
+  PRIMARY KEY (`unternehmen`, `analyst`,`datum`,`zeithorizont`,`neues_kursziel`,`altes_kursziel`,`kurs_bei_veroeffentlichung`),
+  Foreign Key (`analyst`) references `analyst`(`id`) ON DELETE CASCADE,
+  Foreign Key (`unternehmen`) references `unternehmen`(`id`)  ON DELETE CASCADE,
+  Foreign Key (`neue_einstufung`) references `einstuffung`(`id`),
+  Foreign Key (`alte_einstufung`) references `einstuffung`(`id`)
+) 
