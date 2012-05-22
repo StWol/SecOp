@@ -10,7 +10,7 @@ import read_textfile, valid_dictionaries
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
-
+reader = ''
 #####################################################################
 ##############         Init DB Connection        ####################
 #####################################################################
@@ -215,37 +215,38 @@ def __companyPredictionsToDB(company):
 
 # Fuer Initialisierung
 def installDB():
-	reader = read_textfile.Reader() 
+	global reader 
+      reader = read_textfile.Reader() 
 
 # Fuer Update
 def updateDB():
-	reader = read_textfile.Reader(mode="update") 
+	global reader
+      reader = read_textfile.Reader(mode="update") 
 
            
-
 #1. Einstuffungen
-#einstufungenToDB(einstufungen)
-#print "Einstuffungen gespeichert"
+einstufungenToDB(einstufungen)
+print "Einstuffungen gespeichert"
 
 #2. Indizes 
-#inx = indexToDB(indizes_dic.values())   
-#print "insert %d indizies" % len( inx )
+inx = indexToDB(indizes_dic.values())   
+print "insert %d indizies" % len( inx )
 
 #3. Analystenhaeuser
-#haeuser = analystenhausToDB(reader.get_analyseHaeuser())
-#print "insert %d analystenhaeuser" % len( haeuser )
+haeuser = analystenhausToDB(reader.get_analyseHaeuser())
+print "insert %d analystenhaeuser" % len( haeuser )
 
 #4. Analysten
-#ana = analystToDB(reader.get_analystenList())
-#print "insert %d analyst" % len( ana )
+ana = analystToDB(reader.get_analystenList())
+print "insert %d analyst" % len( ana )
 
 #5. Unternehmen
-#cp_dict = companyToDB(symbol_dict)
-#print "%d Unternehmen eingefügt" % len(cp_dict)
+cp_dict = companyToDB(symbol_dict)
+print "%d Unternehmen eingefügt" % len(cp_dict)
 
 #6. Vorhersagen
-#count = allPredictionsToDB(symbol_dict.values())
-#print "%d Vorhersagen eingefügt" % count
+count = allPredictionsToDB(symbol_dict.values())
+print "%d Vorhersagen eingefügt" % count
 
 #7. Kursdaten
 kursdatenToDB(valid_dictionaries.symbol_dict.keys())
