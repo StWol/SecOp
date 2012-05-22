@@ -5,7 +5,8 @@ Created on Thu May 10 11:53:09 2012
 @author: Stan
 """
 import urllib2, sys, MySQLdb
-import read_textfile, valid_dictionaries
+from read_textfile import *
+from valid_dictionaries import *
 
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta

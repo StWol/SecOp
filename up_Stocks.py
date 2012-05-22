@@ -8,10 +8,10 @@ from valid_dictionaries import *
 
 # MYSQL Server Connection Kursdaten
 try:
-    conn = MySQLdb.connect (host = "localhost",
-                            user = "root",
-                            passwd = "",
-                            db = "Kursdaten")
+    conn = MySQLdb.connect (host="141.62.65.151",
+                            user = "stan",
+                            passwd = "money!",
+                            db = "secop")
     print "Mit Kursdaten verbunden"
                             
 except MySQLdb.Error, e:

@@ -66,9 +66,9 @@ print "####################"
 print
 print "####################"
 print "Starte Stock Update"
-#update_stocks()
+update_stocks()
 #update_indizes()
-#finish_up_Stocks()
+finish_up_Stocks()
 print "Stock Update abgeschlossen"
 print "####################"
 
