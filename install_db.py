@@ -5,7 +5,7 @@ Created on Thu May 10 11:53:09 2012
 @author: Stan
 """
 import urllib2, sys, MySQLdb
-from read_textfile import *
+import read_textfile
 from valid_dictionaries import *
 
 from datetime import datetime, timedelta, date
@@ -216,13 +216,13 @@ def __companyPredictionsToDB(company):
 
 # Fuer Initialisierung
 def installDB():
-	global reader 
-      reader = read_textfile.Reader() 
+    global reader 
+    reader = read_textfile.Reader() 
 
 # Fuer Update
 def updateDB():
-	global reader
-      reader = read_textfile.Reader(mode="update") 
+    global reader
+    reader = read_textfile.Reader(mode="update") 
 
            
 #1. Einstuffungen
