@@ -50,10 +50,15 @@ def update_stocks():
               vl = int(data[5])
               amount_ch = cl - op
               percent_ch = (amount_ch/op)*100
-              sql = "INSERT INTO %s (kurzel,ISIN, \
-                      date,open,close,volume,amount_change,percent_change) \
-                      VALUES ('%s','%s','%s','%.2f', '%.2f', '%d', '%.2f', '%.2f' )" % \
-                      (symbol_dict[t][1],t,symbol_dict[t][0],datum,op,cl,vl,amount_ch,percent_ch)
+#              sql = "INSERT INTO %s (kurzel,ISIN, \
+#                      date,open,close,volume,amount_change,percent_change) \
+#                      VALUES ('%s','%s','%s','%.2f', '%.2f', '%d', '%.2f', '%.2f' )" % \
+#                      (symbol_dict[t][1],t,symbol_dict[t][0],datum,op,cl,vl,amount_ch,percent_ch)
+              sql = "INSERT INTO `kursdaten` (`unternehmen`, \
+                  `datum`, `open`, `close`, `volume`, `amount_change`, `percent_change`) \
+                  VALUES ((SELECT `id` FROM `unternehmen` WHERE `kuerzel`='%s'),'%s','%.2f', '%.2f', '%d', '%.2f', '%.2f' )" % \
+                  (t,datum,op,cl,vl,amount_ch,percent_ch)        
+                      
               try:
                   cursor.execute(sql)
                   conn.commit()
