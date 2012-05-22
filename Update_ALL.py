@@ -22,7 +22,7 @@ from valid_dictionaries import *
 from up_Stocks import *
 from up_get_predictions import *
 from up_prediction_to_database import *
-
+from instal_db import *
 
 ##################################
 #           START
@@ -80,7 +80,8 @@ print "Starte Prognosen Update"
 #--> Textfiles
 main_prediction()
 #--> Datenbank
-main_to_db()
+#main_to_db()
+updateDB()
 print "Prognosen Update abgeschlossen"
 print "####################"
 

@@ -15,15 +15,11 @@ from dateutil.relativedelta import relativedelta
 ##############         Init DB Connection        ####################
 #####################################################################
 try:
-#    conn = MySQLdb.connect (host="141.62.65.151",
-#                            user = "stan",
-#                            passwd = "money!",
-#                            db = "secop")
-
-    conn = MySQLdb.connect (host="localhost",
-                            user = "root",
-                            passwd = "83jhs52u18s",
-                            db = "secop")                        
+    conn = MySQLdb.connect (host="141.62.65.151",
+                            user = "stan",
+                            passwd = "money!",
+                            db = "secop")
+                      
     print "Mit secop verbunden"
                             
 except MySQLdb.Error, e:
@@ -217,27 +213,39 @@ def __companyPredictionsToDB(company):
     return len (predcit_list)
     
 
+# Fuer Initialisierung
+def installDB():
+	reader = read_textfile.Reader() 
 
-reader = read_textfile.Reader()            
+# Fuer Update
+def updateDB():
+	reader = read_textfile.Reader(mode="update") 
 
+           
 
+#1. Einstuffungen
 #einstufungenToDB(einstufungen)
 #print "Einstuffungen gespeichert"
-# 
+
+#2. Indizes 
 #inx = indexToDB(indizes_dic.values())   
 #print "insert %d indizies" % len( inx )
-# 
+
+#3. Analystenhaeuser
 #haeuser = analystenhausToDB(reader.get_analyseHaeuser())
 #print "insert %d analystenhaeuser" % len( haeuser )
-#
+
+#4. Analysten
 #ana = analystToDB(reader.get_analystenList())
 #print "insert %d analyst" % len( ana )
 
-#
+#5. Unternehmen
 #cp_dict = companyToDB(symbol_dict)
 #print "%d Unternehmen eingefügt" % len(cp_dict)
-#
+
+#6. Vorhersagen
 #count = allPredictionsToDB(symbol_dict.values())
 #print "%d Vorhersagen eingefügt" % count
 
+#7. Kursdaten
 kursdatenToDB(valid_dictionaries.symbol_dict.keys())
