@@ -6,7 +6,7 @@ Created on Wed May 16 07:53:13 2012
 """
 
 from valid_dictionaries import *
-
+from db_connector import *
 
 UPDATE_MODE = "update"
 INIT_MODE = "init"

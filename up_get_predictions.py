@@ -410,13 +410,13 @@ def main_prediction():
 #
 tickers = symbol_dict.keys()
 banks = bankhaus_dict.keys()
-print "Ausfuehrung gestartet!"
+#print "Ausfuehrung gestartet!"
 
 
 
-main_prediction()
+#main_prediction()
 
 
-print "Ausfuehrung beendet"
+#print "Ausfuehrung beendet"
 
   

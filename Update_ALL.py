@@ -5,24 +5,10 @@ Created on Wed Apr 25 21:30:07 2012
 @author: Philipp
 """
 
-import urllib2
-import sys
-import MySQLdb
-from valid_dictionaries import *
-import urllib2
-from bs4 import BeautifulSoup
-from datetime import *
-import re
 import time
-import math
-import h5py
-import numpy as np
-import time
-from valid_dictionaries import *
-from up_Stocks import *
-from up_get_predictions import *
-from up_prediction_to_database import *
-from instal_db import *
+import up_Stocks 
+import up_get_predictions
+import install_db
 
 ##################################
 #           START
@@ -66,9 +52,8 @@ print "####################"
 print
 print "####################"
 print "Starte Stock Update"
-update_stocks()
-#update_indizes()
-finish_up_Stocks()
+up_Stocks.update_stocks()
+up_Stocks.finish_up_Stocks()
 print "Stock Update abgeschlossen"
 print "####################"
 
@@ -77,25 +62,15 @@ print "####################"
 print
 print "####################"
 print "Starte Prognosen Update"
-#--> Textfiles
-main_prediction()
-#--> Datenbank
-#main_to_db()
-updateDB()
+up_get_predictions.main_prediction()
+install_db.updateDB()
 print "Prognosen Update abgeschlossen"
 print "####################"
 
 print
 print "####################"
 
-if (kontrolle == 0) and (control==0):
-    print "Update Erfolgreich!"
-    print
-    print "####################"
-else:
-    print "Update fehlerhaft!"
-    print
-    print "####################"
+
 
 
 

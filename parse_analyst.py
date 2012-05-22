@@ -6,27 +6,27 @@ Created on Thu May 17 21:59:38 2012
 """
 import MySQLdb, sys
 from nltk.metrics import edit_distance
-
+from db_connector import *
 #####################################################################
 ##############         Init DB Connection        ####################
 #####################################################################
-try:
-    conn = MySQLdb.connect (host="141.62.65.151",
-                            user = "stan",
-                            passwd = "money!",
-                            db = "secop")
+#try:
+#    conn = MySQLdb.connect (host="141.62.65.151",
+#                            user = "stan",
+#                            passwd = "money!",
+#                            db = "secop")
 
 #    conn = MySQLdb.connect (host="localhost",
 #                            user = "root",
 #                            passwd = "83jhs52u18s",
 #                            db = "secop")                        
-    print "Mit secop verbunden"
-                            
-except MySQLdb.Error, e:
-    print "Error %d: %s" % (e.args[0], e.args[1])
-    sys.exit (1) 
-    
-cursor = conn.cursor ()
+#    print "Mit secop verbunden"
+#                            
+#except MySQLdb.Error, e:
+#    print "Error %d: %s" % (e.args[0], e.args[1])
+#    sys.exit (1) 
+#    
+#cursor = conn.cursor ()
 
 def get_analyst():
     

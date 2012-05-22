@@ -8,7 +8,7 @@ einstufungen = ['Buy', ' Sell', 'Neutral']
 
 indizes_dic = {'%5EGDAXI':'DAX'
                ,'%5EMDAXI':'MDAX'
-               ,'%5ETECDAX':'TECDAX'}
+               ,'%5ETECDAX':'TecDAX'}
 
 bankhaus_dict = {		
                     'Bank Vontobel':'Bank_Vontobel'
@@ -167,6 +167,8 @@ symbol_dict = {
 		,'SWV.DE'  : ('DE0005108401','Solarworld','TecDAX')
 		,'UTDI.DE'  : ('DE0005089031','United_Internet','TecDAX')
 		,'WDI.DE'  : ('DE0007472060','Wirecard','TecDAX')
-        }            
+        }   
+
+     
 
         

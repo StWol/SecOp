@@ -7,27 +7,28 @@ Created on Thu May 10 11:53:09 2012
 import urllib2, sys, MySQLdb
 from read_textfile import *
 from valid_dictionaries import *
+from db_connector import *
 
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
 reader = ''
-#####################################################################
-##############         Init DB Connection        ####################
-#####################################################################
-try:
-    conn = MySQLdb.connect (host="141.62.65.151",
-                            user = "stan",
-                            passwd = "money!",
-                            db = "secop")
-                      
-    print "Mit secop verbunden"
+######################################################################
+###############         Init DB Connection        ####################
+######################################################################
+#try:
+#    conn = MySQLdb.connect (host="141.62.65.151",
+#                            user = "stan",
+#                            passwd = "money!",
+#                            db = "secop")
+#                      
+#    print "Mit secop verbunden"
                             
-except MySQLdb.Error, e:
-    print "Error %d: %s" % (e.args[0], e.args[1])
-    sys.exit (1) 
+#except MySQLdb.Error, e:
+#    print "Error %d: %s" % (e.args[0], e.args[1])
+#    sys.exit (1) 
     
-cursor = conn.cursor ()
+#cursor = conn.cursor ()
 
 
 now = datetime.now()
@@ -82,7 +83,7 @@ def companyToDB(company_dict):
             print "unternehmen %s eingefuegt" % key 
         except:
             conn.rollback()
-            print "Unexpected error:", sys.exc_info()[1]
+            print "Unexpected error: %s (%s)" %(sys.exc_info()[1], sql)
     return company_whit_db_id_dict
         
 # alle Kursdaten in der DB speichern
@@ -117,6 +118,12 @@ def kursdatenToDB(company_kuerzel_list):
                 continue
 
         print "unternehmen %s eingefuegt mit %d zeilen" % (company, len(rows))
+    upd = datetime.strftime(now,'%Y-%m-%d')
+    upd = str(upd)
+    version_string = "Stocks_Version/version.txt"
+    fin_version = open(version_string,"w")
+    version = fin_version.write(upd)
+    fin_version.close() 
 
 
 # alle Analystenhaeuser in die DB speichern
@@ -209,45 +216,45 @@ def __companyPredictionsToDB(company):
             conn.commit()
         except MySQLdb.Error, e:
             conn.rollback()
-            print "Error %d: %s \t in %s" % (e.args[0], e.args[1], company.replace("_"," "))        
-        
+            print "Error %d: %s \t in %s" % (e.args[0], e.args[1], company)        
     return len (predcit_list)
     
 
 # Fuer Initialisierung
 def installDB():
     global reader 
-    reader = read_textfile.Reader() 
+    reader = Reader() 
+    main()
+    kursdatenToDB(symbol_dict.keys())
 
 # Fuer Update
 def updateDB():
     global reader
-    reader = read_textfile.Reader(mode="update") 
-
-           
-#1. Einstuffungen
-einstufungenToDB(einstufungen)
-print "Einstuffungen gespeichert"
-
-#2. Indizes 
-inx = indexToDB(indizes_dic.values())   
-print "insert %d indizies" % len( inx )
-
-#3. Analystenhaeuser
-haeuser = analystenhausToDB(reader.get_analyseHaeuser())
-print "insert %d analystenhaeuser" % len( haeuser )
-
-#4. Analysten
-ana = analystToDB(reader.get_analystenList())
-print "insert %d analyst" % len( ana )
-
-#5. Unternehmen
-cp_dict = companyToDB(symbol_dict)
-print "%d Unternehmen eingefügt" % len(cp_dict)
-
-#6. Vorhersagen
-count = allPredictionsToDB(symbol_dict.values())
-print "%d Vorhersagen eingefügt" % count
-
-#7. Kursdaten
-kursdatenToDB(valid_dictionaries.symbol_dict.keys())
+    reader = Reader(mode="update") 
+    main()
+    
+def main():
+             
+    #1. Einstuffungen
+    einstufungenToDB(einstufungen)
+    print "Einstuffungen gespeichert"
+    
+    #2. Indizes 
+    inx = indexToDB(indizes_dic.values())   
+    print "insert %d indizies" % len( inx )
+    
+    #3. Analystenhaeuser
+    haeuser = analystenhausToDB(reader.get_analyseHaeuser())
+    print "insert %d analystenhaeuser" % len( haeuser )
+    
+    #4. Analysten
+    ana = analystToDB(reader.get_analystenList())
+    print "insert %d analyst" % len( ana )
+    
+    #5. Unternehmen
+    cp_dict = companyToDB(symbol_dict)
+    print "%d Unternehmen eingefügt" % len(cp_dict)
+    
+    #6. Vorhersagen
+    count = allPredictionsToDB(symbol_dict.values())
+    print "%d Vorhersagen eingefügt" % count

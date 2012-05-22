@@ -4,20 +4,20 @@ import sys
 import MySQLdb
 from datetime import *
 from valid_dictionaries import *
-
+from db_connector import *
 
 # MYSQL Server Connection Kursdaten
-try:
-    conn = MySQLdb.connect (host="141.62.65.151",
-                            user = "stan",
-                            passwd = "money!",
-                            db = "secop")
-    print "Mit Kursdaten verbunden"
-                            
-except MySQLdb.Error, e:
-    print "Error %d: %s" % (e.args[0], e.args[1])
-    sys.exit (1)    
-cursor = conn.cursor ()
+#try:
+#    conn = MySQLdb.connect (host="141.62.65.151",
+#                            user = "stan",
+#                            passwd = "money!",
+#                            db = "secop")
+#    print "Mit Kursdaten verbunden"
+#                            
+#except MySQLdb.Error, e:
+#    print "Error %d: %s" % (e.args[0], e.args[1])
+#    sys.exit (1)    
+#cursor = conn.cursor ()
 
 
 ####################################
@@ -25,6 +25,12 @@ cursor = conn.cursor ()
 ####################################
 
 def update_stocks():
+    version_string = "Stocks_Version/version.txt"
+    fin_version = open(version_string,"r")
+    version = (fin_version.readline()).strip()
+    fin_version.close() 
+    version = version.split("-")   
+    n_m = str(int(version[1]) -1) 
     tickers=symbol_dict.keys()
     
     for t in tickers:
@@ -141,10 +147,5 @@ d = now.day
 kontrolle = 0                    
 
 # datum des letzten updates
-version_string = "Stocks_Version/version.txt"
-fin_version = open(version_string,"r")
-version = (fin_version.readline()).strip()
-fin_version.close() 
-version = version.split("-")   
-n_m = str(int(version[1]) -1)   
+  
           

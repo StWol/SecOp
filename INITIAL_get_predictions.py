@@ -308,14 +308,7 @@ def main_prediction():
             parse_company(0,1,t,company_result_set)
         
         
-
-
 tickers = symbol_dict.keys()
 banks = bankhaus_dict.keys()
-print "Ausfuehrung gestartet!"
-main_prediction()
-
-
-print "Ausfuehrung beendet"
 
   
