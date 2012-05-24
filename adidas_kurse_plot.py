@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Mon May 14 21:21:48 2012
 
@@ -43,42 +42,15 @@ def get_select(sql):
         conn.rollback()
         print "Error %d: %s" % (e.args[0], e.args[1])
 
-sql1 = """SELECT avg, datum FROM analyst_avg WHERE unternehmen = 1 ORDER BY datum"""
-sql2 = """SELECT analyst, avg, datum FROM analyst_avg_2 WHERE unternehmen = 1  AND `datum`> '2009-01-01' AND `datum`<(SELECT CURDATE()) ORDER BY datum """
-sql3 = """SELECT neues_kursziel, zieldatum FROM analyst_avg_2 WHERE unternehmen = 1  AND `datum`> '2009-01-01' AND `datum`<(SELECT CURDATE()) ORDER BY zieldatum """
+sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =1  GROUP BY YEAR( `datum` ) , MONTH( `datum` )"
+sql1 = """SELECT `neues_kursziel`,  `zieldatum`
+    FROM `prognose`, `analyst`, `analystenhaus`
+    WHERE `zeithorizont`>0 AND `neues_kursziel`>0 AND `unternehmen` =1 AND `analyst` = `analyst`.`id` AND `analyst`.`analystenhaus`=`analystenhaus`.`id`"""
+sql2 = """SELECT avg,datum FROM unternehmen_avg WHERE unternehmen = 1 ORDER BY datum"""
 
-
-avg_kurse = get_select(sql2)
-ziel_kurse = get_select(sql3)
-
-analysten_keys = [q[0] for q in avg_kurse]
-
-avg = [q[1] for q in avg_kurse]
-
-datum_avg = [q[2] for q in avg_kurse]
-datum_avg =dates.date2num(datum_avg)
-
-new_kurs = [q[0] for q in ziel_kurse]
-
-
-
-datum_ziel = [q[1] for q in ziel_kurse]
-datum_ziel =dates.date2num(datum_ziel)
-#print avg
 date1 = datetime.date( 2006, 1, 31 )
 date2 = datetime.date( 2012, 5, 21 )
 
-
-MSE = 0
-l = len(datum_avg)
-
-for z,j in zip(new_kurs,avg):
-    MSE = MSE + ((z-j)**2)
-    
-MSE = MSE/l
-
-
-sigma = np.sqrt(MSE)
 # every monday
 
 
@@ -87,25 +59,35 @@ months    = MonthLocator(range(1,13))
 monthsFmt = DateFormatter("%b '%y")
 
 
-
 #quotes = quotes_historical_yahoo('INTC', date1, date2)
+quotes = get_select(sql)
+
+if len(quotes) == 0:
+    print 'Found no quotes'
+    raise SystemExit
+
+datesss = [q[1] for q in quotes]
+opens = [q[0] for q in quotes]
+
+kurse = get_select(sql1)
+
+
+
+n_k = [q[0] for q in kurse]
+date1 = [q[1] for q in kurse]
+
+datesss = dates.date2num(datesss)
+print opens
+print datesss
 
 fig = figure()
 ax = fig.add_subplot(111)
+ax.plot_date(datesss, opens, '-')
 ax.hold(True)
 ax = fig.add_subplot(111)
-ax.plot_date(datum_ziel, new_kurs, 'go')
+ax.plot_date(date1, n_k, 'o')
 ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
-
-ax.hold(True)
-ax = fig.add_subplot(111)
-#ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
-#ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
-ax.fill_between(datum_ziel, new_kurs + 1.9600 * sigma, new_kurs - 1.9600 * sigma, alpha=.5, linestyle='dashed', edgecolor="blue" )
-ax.hold(True)
-ax = fig.add_subplot(111)
-ax.plot_date(datum_avg, avg, 'o-')
 #ax.xaxis.set_minor_locator(mondays)
 ax.autoscale_view()
 #ax.xaxis.grid(False, 'major')
@@ -115,6 +97,3 @@ ax.grid(True)
 fig.autofmt_xdate()
 
 show()
-
-
-# every monday
