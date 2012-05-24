@@ -67,9 +67,9 @@ sql1 = """SELECT `neues_kursziel`,  `zieldatum`
 #sql2 = """SELECT avg,datum,neues_kursziel,analyst FROM analyst_avg_2 WHERE unternehmen = 1 ORDER BY datum """
 sql2 = """SELECT avg,datum,neues_kursziel,analyst FROM analyst_avg_2
          WHERE unternehmen = 1 AND analyst = 779 AND `datum`> '2009-01-01' AND `datum`<(SELECT CURDATE())"""
-sql_prog = """SELECT avg,datum,neues_kursziel,analyst FROM analyst_avg_2
-         WHERE unternehmen = 1 AND analyst = 779 AND `datum`>(SELECT CURDATE())"""
-
+sql_prog = """SELECT zieldatum,neues_kursziel,analyst FROM prognose
+         WHERE unternehmen = 1 AND `zieldatum`>(SELECT CURDATE())"""
+"""AND analyst = 779 """
 
 avg_nk = get_select(sql2)
 avg = [q[0] for q in avg_nk]

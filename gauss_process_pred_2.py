@@ -65,9 +65,9 @@ sql1 = """SELECT `neues_kursziel`,  `zieldatum`
 
 #sql2 = """SELECT avg,datum,neues_kursziel,analyst FROM analyst_avg_2 WHERE unternehmen = 1 ORDER BY datum """
 sql2 = """SELECT avg,datum,neues_kursziel,analyst FROM analyst_avg_2
-         WHERE unternehmen = 1 AND `datum`> '2009-01-01' AND `datum`<(SELECT CURDATE())"""
-sql_prog = """SELECT avg,datum,neues_kursziel,analyst FROM analyst_avg_2
-         WHERE unternehmen = 1 AND `datum`>(SELECT CURDATE())"""
+         WHERE unternehmen = 1 AND analyst = 779 AND `datum`> '2009-01-01' AND `datum`<(SELECT CURDATE())"""
+sql_prog ="""SELECT zieldatum,neues_kursziel,analyst FROM prognose
+         WHERE unternehmen = 1 AND analyst = 779 AND `zieldatum`>(SELECT CURDATE())"""
 """AND analyst = 779"""
 
 sql_date = "SELECT AVG( close ) , `datum` FROM kursdaten GROUP BY YEAR( `datum` ) , MONTH( `datum` )"
@@ -82,10 +82,9 @@ i = 0
 for z,j in zip(global_dates,global_avg):
     global_dates_dict[z] = [i,j]
     i = i+1  
-    global_list.append()
-
-print global_dates_dict    
-
+    global_list.append([i,j])
+global_x = [z[0] for z in global_list]
+global_y = [z[1] for z in global_list]
 #print global_dates_dict
 
 avg_nk = get_select(sql2)
@@ -109,40 +108,63 @@ for i in analyst:
     analyst_result[i] = []
     
 for i in analyst_dict:
-    analyst_dict[i].append([[q[2] for q in avg_nk if q[3]==i],[q[1] for q in avg_nk if q[3]==i],[q[0] for q in avg_nk if q[3]==i]])
+    analyst_dict[i].append([[q[2] for q in avg_nk if q[3]==i],[dates.date2num(q[1]) for q in avg_nk if q[3]==i],[q[0] for q in avg_nk if q[3]==i]])
 
 for i in analyst_dict:
-    X = np.atleast_2d(np.arange(0,len(analyst_dict[i][0][0]))).T
-    y = np.atleast_2d(analyst_dict[i][0][0]).T
-    MSE = get_MSE(analyst_dict[i][0][0],analyst_dict[i][0][2])
+    days_for_prog = []
+    progs = []
+    
+    key = analyst_dict[i][0][1]
+    prog = analyst_dict[i][0][0]
+    print prog
+    for k in key:       
+        days_for_prog.append(global_dates_dict[k][0])
+    for p in prog:
+        progs.append(p)
+        
+    X = np.atleast_2d(np.array(days_for_prog)).T
+    y = np.atleast_2d(progs).T
+    MSE = get_MSE(progs,analyst_dict[i][0][2])
     print "Analyst: %d" %(i)
     print "MSE: %f" %(MSE)
     sigma = float(np.sqrt(MSE))
     print "sigma: %f" %(sigma)
     analyst_MSE[i].append([X,y])
     
+    
+    
+    
     y_werte = get_select(sql_prog)
-    avg_prog = [q[0] for q in y_werte]
-    new_kurs_prog = [q[2] for q in y_werte]
-    datum_ziel_prog = [q[1] for q in y_werte]
+    
+    new_kurs_prog = [q[1] for q in y_werte]
+    datum_ziel_prog = [q[0] for q in y_werte]
     datum_ziel_prog =dates.date2num(datum_ziel_prog)
-    analyst_prog = [q[3] for q in y_werte]
+    analyst_prog = [q[2] for q in y_werte]
+    
     for i in analyst_pred:
-        analyst_pred[i].append([[q[2] for q in y_werte if q[3]==i],[q[1] for q in y_werte if q[3]==i],[q[0] for q in y_werte if q[3]==i]])
-        X_pred = np.atleast_2d(np.arange(len(analyst_pred[i][0][0]),len(analyst_pred[i][0][0])+len(new_kurs_prog))).T
-        y_pred = np.atleast_2d(new_kurs_prog).T
+        analyst_pred[i].append([[q[1] for q in y_werte if q[2]==i],[q[0] for q in y_werte if q[2]==i],[q[2] for q in y_werte if q[2]==i]])
+
+        days_for_prog_pred = []
+        progs_pred = []
+    
+        key_pred = analyst_dict[i][0][1]
+        prog_pred = analyst_dict[i][0][0]
+        for k in key_pred:       
+            days_for_prog_pred.append(global_dates_dict[k][0])
+        for p in prog:
+            progs_pred.append(p)
+            
+        X_pred = np.atleast_2d(days_for_prog_pred).T
+        y_pred = np.atleast_2d(progs_pred).T
     #x = np.atleast_2d(np.arange(len(new_kurs),len(new_kurs)+len(analyst_dict[i][0][0]))).T
-    x = np.atleast_2d(np.arange(0,len(analyst_dict[i][0][0]))).T
-    x_pred = np.atleast_2d(np.arange(len(analyst_pred[i][0][0]),len(analyst_pred[i][0][0])+len(new_kurs_prog))).T
-    x_gesamt = np.atleast_2d(np.arange(0,len(new_kurs_prog)+len(analyst_dict[i][0][0]))).T
+    x = np.atleast_2d(global_x).T
+    x_pred = np.atleast_2d(np.arange(len(global_x),len(days_for_prog_pred)+len(global_x))).T
+    x_gesamt = np.atleast_2d(np.arange(0,len(global_x)+len(days_for_prog_pred))).T
     y_gesamt = np.concatenate((y[:],y_pred[:]))
     analyst_result[i] = ([X,y,MSE,X_pred,y_pred,x,x_pred,x_gesamt,y_gesamt,sigma])
   
-print analyst_result[798][0][0]
-print analyst_result[798][1][0]
-print analyst_result[798][2][0]
 # Instanciate a Gaussian Process model
-gp = GaussianProcess(corr='cubic', theta0=1e-2, thetaL=1e-4, thetaU=1e-1)
+#gp = GaussianProcess(corr='cubic', theta0=1e-2, thetaL=1e-4, thetaU=1e-1)
 
 # Fit to data using Maximum Likelihood Estimation of the parameters
 #gp.fit(X, y)
@@ -154,9 +176,7 @@ gp = GaussianProcess(corr='cubic', theta0=1e-2, thetaL=1e-4, thetaU=1e-1)
 # Plot the function, the prediction and the 95% confidence interval based on
 # the MSE
 
-ui = range (len(avg))
-
-pl.plot(global_dates_dict.values(),global_avg, 'b-', markersize=10, label=u'tatsaechlicher kurs')
+pl.plot(global_x,global_y, 'b-', markersize=10, label=u'tatsaechlicher kurs')
 pl.hold(True)
 #for i in analyst_result:
     
@@ -171,14 +191,14 @@ pl.hold(True)
     #pl.hold(True)
 
 
-pl.plot(analyst_result[798][0][0], analyst_result[798][1][0], 'r.', markersize=10, label=u'prognosen')
+pl.plot(X, y, 'r.', markersize=10, label=u'prognosen')
 pl.hold(True)
-pl.plot(analyst_result[798][3][0], analyst_result[798][4][0], 'g.', label=u'Zukunftsprog')
+pl.plot(X_pred, y_pred, 'g.', label=u'Zukunftsprog')
 pl.hold(True)
-pl.fill(np.concatenate([analyst_result[798][7][0], analyst_result[798][7][0][::-1]]), \
-    np.concatenate([analyst_result[798][8][0] - 1.9600 * analyst_result[798][9][0],
-                   (analyst_result[798][8][0] + 1.9600 * analyst_result[798][9][0])[::-1]]), \
-    alpha=.5, fc='b', ec='None', label='95% confidence interval')
+#pl.fill(np.concatenate([x_gesamt, x_gesamt[::-1]]), \
+#    np.concatenate([y_gesamt - 1.9600 * sigma,
+#                   (y_gesamt + 1.9600 * sigma)[::-1]]), \
+#    alpha=.5, fc='b', ec='None', label='95% confidence interval')
 pl.hold(True)
 
 pl.xlabel('$x$')
