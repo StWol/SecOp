@@ -155,7 +155,7 @@ ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
 ax.hold(True)
 ax = fig.add_subplot(111)
-ax.plot_date(datum_avg, avg,'-',color='black')
+ax.plot_date(datum_avg, avg,'-',color='black',label='tats. Kurs',linewidth=2)
 ax.hold(True)
 ################################################################################
 ### Die Schleife läuft jeden Analysten durch und ruft die methode zum zeichnen auf
@@ -193,7 +193,7 @@ ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
 ax.autoscale_view()    
 ax.grid(True)
-
+ax.legend(loc='upper left')
 fig.autofmt_xdate()
 
 show()
