@@ -168,7 +168,6 @@ for k,v in analysten_dict.iteritems():
     col_sig_list = plot_analyst(kurse, avgs, daten) 
     color = col_sig_list[0]
     sigma = col_sig_list[1]
-#    try:    
     if k in analysten_prognosen_dict.keys():    
         val = analysten_prognosen_dict[k]
         prognose_kurs=[] 
@@ -178,8 +177,6 @@ for k,v in analysten_dict.iteritems():
             prognose_kurs.append(i[0])
             prognose_datum.append(i[1])
         plot_future(prognose_kurs, prognose_datum,color,sigma)
-#    except:
-#        print "Key Error!"
 
 for k in analysten_prognosen_dict.keys():
     if k not in analysten_dict.keys():
