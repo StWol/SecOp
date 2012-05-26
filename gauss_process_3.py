@@ -141,7 +141,6 @@ for row in prognose:
 for row in prognose:  
     value = analysten_prognosen_dict[row[2]]
     value.append([row[0],dates.date2num(row[1])])
-print analysten_prognosen_dict[779]
     
 #date1 = datetime.date( 2006, 1, 31 )
 #date2 = datetime.date( 2012, 5, 21 )
@@ -161,12 +160,9 @@ ax.hold(True)
 ################################################################################
 ### Die Schleife läuft jeden Analysten durch und ruft die methode zum zeichnen auf
 for k,v in analysten_dict.iteritems():
-    print k
     kurse = [q[0] for q in v]
     avgs = [q[1] for q in v]
     daten = [q[2] for q in v]
-    print kurse
-    print daten
     #prepare_plotting(kurse, avgs, daten,analysten_prognosen_dict,k)
     #plot_analyst(kurse, avgs, daten)
     col_sig_list = plot_analyst(kurse, avgs, daten) 
@@ -181,11 +177,20 @@ for k,v in analysten_dict.iteritems():
             
             prognose_kurs.append(i[0])
             prognose_datum.append(i[1])
-        print prognose_kurs
-        print prognose_datum    
         plot_future(prognose_kurs, prognose_datum,color,sigma)
 #    except:
 #        print "Key Error!"
+
+for k in analysten_prognosen_dict.keys():
+    if k not in analysten_dict.keys():
+        val = analysten_prognosen_dict[k]
+        prognose_kurs=[] 
+        prognose_datum = []
+        for i in val:
+            
+            prognose_kurs.append(i[0])
+            prognose_datum.append(i[1])
+        plot_future(prognose_kurs, prognose_datum,color,sigma)
     
 ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
