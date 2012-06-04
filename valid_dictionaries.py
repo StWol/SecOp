@@ -4,7 +4,7 @@ Created on Mon Apr 09 16:53:59 2012
 
 @author: Philipp
 """
-einstufungen = ['Buy', ' Sell', 'Neutral']
+einstufungen = ['Buy', 'Sell', 'Neutral']
 
 indizes_dic = {'%5EGDAXI':'DAX'
                ,'%5EMDAXI':'MDAX'

@@ -62,6 +62,25 @@ def prepare_plotting(kurse, avgs, daten,analysten_prognosen_dict,k):
         
         plot_future(prognose_kurs, prognose_datum,liste)
 
+
+
+################################################################################    
+def plot_future_unbekannt(prognose_kurs, prognose_datum,color):
+    
+    ax = fig.add_subplot(111)
+    ax.plot_date(prognose_datum, prognose_kurs, 'o-', color=color)
+
+    ax.hold(True)
+    ax = fig.add_subplot(111)
+    #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
+    #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
+    #ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+
+    ax.hold(True)
+    
+
+
+
 ################################################################################    
 def plot_future(prognose_kurs, prognose_datum,color,sigma):
     
@@ -82,8 +101,8 @@ def plot_analyst(kurse, avg, daten):
     color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
     sigma = get_sigma(kurse,avg,daten)
     if sigma < 10:
-        print sigma
-        print len(kurse)
+        #print sigma
+        #print len(kurse)
         ax = fig.add_subplot(111)
         ax.plot_date(daten, kurse, 'o-', color=color)
     
@@ -99,13 +118,13 @@ def plot_analyst(kurse, avg, daten):
    
    
    
-sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = 4  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """
-sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = 4  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """
+sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = 44  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """
+sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = 44  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """
 """analyst in (779,373, 1661,2125) AND"""
-sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =4 GROUP BY YEAR( `datum` ) , MONTH( `datum` )"
+sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =44 GROUP BY YEAR( `datum` ) , MONTH( `datum` )"
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
- WHERE unternehmen = 4  
+ WHERE unternehmen =44  
  AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0 AND zeithorizont>0
  ORDER BY zieldatum"""
 
@@ -164,6 +183,7 @@ ax.hold(True)
 ################################################################################
 ### Die Schleife läuft jeden Analysten durch und ruft die methode zum zeichnen auf
 for k,v in analysten_dict.iteritems():
+    
     kurse = [q[0] for q in v]
     avgs = [q[1] for q in v]
     daten = [q[2] for q in v]
@@ -173,9 +193,10 @@ for k,v in analysten_dict.iteritems():
     color = col_sig_list[0]
     sigma = col_sig_list[1]
     plotted_or_not = col_sig_list[2]
+    
     if plotted_or_not == 1:
         if k in analysten_prognosen_dict.keys():  
-            print k
+            print "bekannt: " ,k
             val = analysten_prognosen_dict[k]
             prognose_kurs=[] 
             prognose_datum = []
@@ -189,14 +210,19 @@ for k,v in analysten_dict.iteritems():
 
 for k in analysten_prognosen_dict.keys():
     if k not in analysten_dict.keys():
+        print "unbekannt: ",k
         val = analysten_prognosen_dict[k]
         prognose_kurs=[] 
         prognose_datum = []
+        color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
+        #sigma_prog = []
         for i in val:
             
             prognose_kurs.append(i[0])
             prognose_datum.append(i[1])
-        plot_future(prognose_kurs, prognose_datum,color,sigma)
+         #   sigma_prog.append(1.)
+        #print sigma_prog
+        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
     
     
 ax.xaxis.set_major_locator(months)

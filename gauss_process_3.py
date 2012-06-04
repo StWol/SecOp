@@ -62,6 +62,22 @@ def prepare_plotting(kurse, avgs, daten,analysten_prognosen_dict,k):
         
         plot_future(prognose_kurs, prognose_datum,liste)
 
+
+def plot_future_unbekannt(prognose_kurs, prognose_datum,color):
+    
+    ax = fig.add_subplot(111)
+    ax.plot_date(prognose_datum, prognose_kurs, 'o-', color=color)
+
+    ax.hold(True)
+    ax = fig.add_subplot(111)
+    #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
+    #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
+    #ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+
+    ax.hold(True)
+    
+
+
 ################################################################################    
 def plot_future(prognose_kurs, prognose_datum,color,sigma):
     
@@ -182,14 +198,19 @@ for k,v in analysten_dict.iteritems():
 
 for k in analysten_prognosen_dict.keys():
     if k not in analysten_dict.keys():
+        print "unbekannt: ",k
         val = analysten_prognosen_dict[k]
         prognose_kurs=[] 
         prognose_datum = []
+        color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
+        #sigma_prog = []
         for i in val:
             
             prognose_kurs.append(i[0])
             prognose_datum.append(i[1])
-        plot_future(prognose_kurs, prognose_datum,color,sigma)
+         #   sigma_prog.append(1.)
+        #print sigma_prog
+        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
     
 ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
