@@ -49,6 +49,7 @@ def einstufungenToDB(einstufungen):
             conn.commit()
         except MySQLdb.Error, e:
             conn.rollback()
+            
             print "Error %d: %s" % (e.args[0], e.args[1])
             continue
 
@@ -112,6 +113,7 @@ def kursdatenToDB(company_kuerzel_list):
                 cursor.execute(sql)
                 conn.commit()
             except:
+                
                 print "Fehler bei insert: %s" % company 
                 print sys.exc_info()[1]
                 conn.rollback()
@@ -185,6 +187,7 @@ def __companyPredictionsToDB(company):
 
     
     for row in predcit_list:
+        
         date = datetime.strptime(row[1],'%Y-%m-%d')
         zieldatum = date + relativedelta( months =+ int(row[2]) )
         
@@ -211,12 +214,15 @@ def __companyPredictionsToDB(company):
                 (SELECT id FROM einstuffung WHERE wert='%s'),
                 '%.2f'                
                 )""" % (company, row[8], row[9],row[1],str(zieldatum),row[2],row[3],row[4],row[5],row[6],row[7])
+       
         try:
             cursor.execute(sql)
             conn.commit()
         except MySQLdb.Error, e:
             conn.rollback()
-            print "Error %d: %s \t in %s" % (e.args[0], e.args[1], company)        
+            if(e.args[0]==1048):
+                print sql
+                print "Error %d: %s \t in %s" % (e.args[0], e.args[1], company)        
     return len (predcit_list)
     
 
@@ -258,3 +264,4 @@ def main():
     #6. Vorhersagen
     count = allPredictionsToDB(symbol_dict.values())
     print "%d Vorhersagen eingefügt" % count
+    

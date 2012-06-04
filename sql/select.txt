@@ -1,4 +1,0 @@
-SELECT  `avg` ,  `kurs_bei_veroeffentlichung` ,  `neue_einstufung` , (
-((avg - kurs_bei_veroeffentlichung) / kurs_bei_veroeffentlichung) *100) AS Veraenderung
-FROM  `analyst_avg_2` 
-WHERE neue_einstufung =1
