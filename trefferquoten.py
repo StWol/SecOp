@@ -136,7 +136,6 @@ trefferquote_nach_analyst_dict = get_Analyst_quote(treffer,gesamt)
 
 
 
-
 ####################################################
 # Trefferquouten nach Unternehmen
 ####################################################
@@ -152,8 +151,18 @@ for row in unternehmen:
 # trefferquote_nach_unternehmen_dict auf folgende form bringen:
 # {id_des_Unternehmens: {id_des_Analysten:[gesamtanzahl_an_Prognosen, treffer, trefferquote]}}
 trefferquote_nach_unternehmen_dict = get_Company_quotes(treffer,gesamt,unternehmen_dict)
-print trefferquote_nach_unternehmen_dict
 #############################################################################
 #############################################################################
-
-
+for k in trefferquote_nach_unternehmen_dict.keys():
+        try:
+            print trefferquote_nach_unternehmen_dict[k]
+            print
+            print 
+            print 
+            print 
+            print 
+            print 
+        except:
+            continue
+        
+print 
