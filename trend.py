@@ -98,12 +98,13 @@ def plot_future(prognose_kurs, prognose_datum,color):
 
     ax.hold(True)
 
-def plot_trend(prognose_datum,quote,last_kurs):
+def plot_trend(prognose_datum,quote,last_kurs,color):
     trend = []
+    print quote
     for i in range(0,len(prognose_datum)):
         trend.append(last_kurs)
     ax = fig.add_subplot(111)
-    ax.plot_date(prognose_datum, trend, '-', color='#ebd82d',linewidth=4)
+    ax.plot_date(prognose_datum, trend, '-', color=color,linewidth=4 + (2 * quote/100))
     ax.hold(True)
     ax = fig.add_subplot(111)
 
@@ -188,13 +189,15 @@ tr_qt_neutral = 1.
 gewicht_buy = 0
 gewicht_sell = 0
 
+print "=================="
+print len(trefferquoten_dict[cp])
+print "=================="
 for i in einstufung:
     if i[0] == 1:
         buy = buy+1
         try:
             if trefferquoten_dict[cp][i[1]][0]>5:            
                 tr_qt_buy = tr_qt_buy * (trefferquoten_dict[cp][i[1]][2]+1)
-                
                 buy_clean = buy_clean+1
         except: 
             continue
@@ -243,12 +246,17 @@ analysten_dict ={}
 
 analysten_prognosen_dict ={} 
 
+
 for row in prognose:
     analysten_prognosen_dict[row[2]] = []
+
+
 for row in prognose:  
     value = analysten_prognosen_dict[row[2]]
     value.append([row[0],dates.date2num(row[1]), row[3]])
     
+print "------------------"
+print "------------------"
 #date1 = datetime.date( 2006, 1, 31 )
 #date2 = datetime.date( 2012, 5, 21 )
 
@@ -276,30 +284,50 @@ count_neutral = 0.
 
 for k in analysten_prognosen_dict.keys():
         val = analysten_prognosen_dict[k]
-        prognose_kurs=[] 
-        prognose_datum = []
-        if val[0][2] == 1:        
-            color ='#00FF00'
-            mittel_buy += val[0][0]
-            count_buy += 1
-        elif val[0][2] == 2:
-            color ='#FF0000'
-            mittel_sell += val[0][0]
-            count_sell += 1
-        elif val[0][2] == 3:
-            color ='#FFFF00'
-            mittel_neutral += val[0][0]
-            count_neutral += 1
         
+        prognose_buy = []
+        prognose_sell = []
+        prognose_neutral = []
+        
+        datum_buy = []
+        datum_sell = []
+        datum_neutral = []
         
         #sigma_prog = []
         for i in val:
             
-            prognose_kurs.append(i[0])
-            prognose_datum.append(i[1])
+            
+            
+            if i[2] == 1.:        
+                color ='#00FF00'
+                mittel_buy += i[0]
+                count_buy += 1
+                prognose_buy.append(i[0])
+                datum_buy.append(i[1])
+                
+            elif i[2] == 2.:
+                color ='#FF0000'
+                mittel_sell += i[0]
+                count_sell += 1
+                prognose_sell.append(i[0])
+                datum_sell.append(i[1])
+                
+            elif i[2]== 3.:
+                color ='#FFFF00'
+                mittel_neutral += i[0]
+                count_neutral += 1
+                prognose_neutral.append(i[0])
+                datum_neutral.append(i[1])
+                
+                
+                
+        
          #   sigma_prog.append(1.)
-        #print sigma_prog
-        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
+        
+        plot_future_unbekannt(prognose_buy, datum_buy,'#00FF00')
+        plot_future_unbekannt(prognose_sell, datum_sell,'#FF0000')
+        plot_future_unbekannt(prognose_neutral, datum_neutral,'#FFFF00')
+        
 
 
 
@@ -312,17 +340,17 @@ mittel_buy = float(mittel_buy)/count_buy
 #print buy_clean
 #print count_buy
 
-print sell
-print sell_clean
-print count_sell
 
+print "====================="
+print count_sell + count_neutral + count_buy
+print "====================="
 ax = fig.add_subplot(111)
 ax.plot_date(datum_avg, avg,'-',color='black',label='tats. Kurs',linewidth=2)
 ax.hold(True)
 
-plot_trend(datum_prognose,t_q_neutral,mittel_neutral)
-plot_trend(datum_prognose,t_q_buy,mittel_buy)
-plot_trend(datum_prognose,t_q_sell,mittel_sell)
+plot_trend(datum_prognose,t_q_neutral,mittel_neutral,'#FFFF00')
+plot_trend(datum_prognose,t_q_buy,mittel_buy,'#00FF00')
+plot_trend(datum_prognose,t_q_sell,mittel_sell,'#FF0000')
 
 
 
