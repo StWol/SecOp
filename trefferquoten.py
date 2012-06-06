@@ -83,7 +83,38 @@ def get_Company_quotes(treffer,gesamt,unternehmen_dict):
 
 
 
+def start_analyst():
+    ####################################################
+    # Gesamt Trefferquoute der Analysten ermitteln
+    ####################################################
+    treffer = get_select(sql)
+    gesamt = get_select(sql2)
 
+    # trefferquote_nach_analyst_dict auf folgende form bringen:
+    # {id_des_Analysten: [gesamtanzahl_an_Prognosen, treffer, trefferquote]}
+    trefferquote_nach_analyst_dict = get_Analyst_quote(treffer,gesamt)
+    return trefferquote_nach_analyst_dict
+    #################################################################################
+    ##################################################################################
+
+def start_company():
+    ####################################################
+    # Trefferquouten nach Unternehmen
+    ####################################################
+    treffer = get_select(sql4)
+    gesamt = get_select(sql3)
+    unternehmen = get_select(sql5)
+
+    unternehmen_dict ={}
+    
+    for row in unternehmen:
+        unternehmen_dict[row[0]] = {}
+
+    # trefferquote_nach_unternehmen_dict auf folgende form bringen:
+    # {id_des_Unternehmens: {id_des_Analysten:[gesamtanzahl_an_Prognosen, treffer, trefferquote]}}
+    trefferquote_nach_unternehmen_dict = get_Company_quotes(treffer,gesamt,unternehmen_dict)
+    return trefferquote_nach_unternehmen_dict
+    
 
 
 ### Analyst <-> anzahl richtiger Prognosen
@@ -120,49 +151,14 @@ SELECT unternehmen FROM analyst_avg_2 WHERE `zieldatum` > '2010-01-01' AND `anal
 """
 
 
-
 ####################################################
 # Gesamt Trefferquoute der Analysten ermitteln
 ####################################################
-treffer = get_select(sql)
-gesamt = get_select(sql2)
-
-# trefferquote_nach_analyst_dict auf folgende form bringen:
-# {id_des_Analysten: [gesamtanzahl_an_Prognosen, treffer, trefferquote]}
-trefferquote_nach_analyst_dict = get_Analyst_quote(treffer,gesamt)
-#################################################################################
-##################################################################################
-
+#start_analyst()
 
 
 
 ####################################################
 # Trefferquouten nach Unternehmen
 ####################################################
-treffer = get_select(sql4)
-gesamt = get_select(sql3)
-unternehmen = get_select(sql5)
-
-unternehmen_dict ={}
-    
-for row in unternehmen:
-    unternehmen_dict[row[0]] = {}
-
-# trefferquote_nach_unternehmen_dict auf folgende form bringen:
-# {id_des_Unternehmens: {id_des_Analysten:[gesamtanzahl_an_Prognosen, treffer, trefferquote]}}
-trefferquote_nach_unternehmen_dict = get_Company_quotes(treffer,gesamt,unternehmen_dict)
-#############################################################################
-#############################################################################
-for k in trefferquote_nach_unternehmen_dict.keys():
-        try:
-            print trefferquote_nach_unternehmen_dict[k]
-            print
-            print 
-            print 
-            print 
-            print 
-            print 
-        except:
-            continue
-        
-print 
+#start_company()
