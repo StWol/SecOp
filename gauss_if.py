@@ -169,7 +169,7 @@ for row in prognose:
 #date1 = datetime.date( 2006, 1, 31 )
 #date2 = datetime.date( 2012, 5, 21 )
 
-months    = MonthLocator(range(1,13))
+months    = MonthLocator(range(1,13),interval = 3)
 monthsFmt = DateFormatter("%b '%y")
 
 

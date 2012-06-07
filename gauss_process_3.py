@@ -72,7 +72,7 @@ def plot_future_unbekannt(prognose_kurs, prognose_datum,color):
     ax = fig.add_subplot(111)
     #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
     #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
-    #ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
 
     ax.hold(True)
     
@@ -88,7 +88,7 @@ def plot_future(prognose_kurs, prognose_datum,color,sigma):
     ax = fig.add_subplot(111)
     #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
     #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
-    #ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
 
     ax.hold(True)
     
@@ -107,7 +107,7 @@ def plot_analyst(kurse, avg, daten):
     sigma = get_sigma(kurse,avg,daten)
     print sigma
     print len(kurse)
-    #ax.fill_between(daten, kurse + 1.9600 * sigma, kurse - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    ax.fill_between(daten, kurse + 1.9600 * sigma, kurse - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
     ax.hold(True)
     return [color,sigma]
    
@@ -163,7 +163,7 @@ for row in prognose:
 #date1 = datetime.date( 2006, 1, 31 )
 #date2 = datetime.date( 2012, 5, 21 )
 
-months    = MonthLocator(range(1,13))
+months    = MonthLocator(range(1,13),interval = 3)
 monthsFmt = DateFormatter("%b '%y")
 
 

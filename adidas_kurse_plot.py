@@ -45,7 +45,7 @@ def get_select(sql):
 sql = "SELECT  close, `datum` FROM kursdaten WHERE unternehmen =103  "
 sql1 = """SELECT `neues_kursziel`,  `zieldatum`
     FROM `prognose`, `analyst`, `analystenhaus`
-    WHERE `zeithorizont`>0 AND `neues_kursziel`>0 AND `unternehmen` =103 AND `analyst` = `analyst`.`id` AND `analyst`.`analystenhaus`=`analystenhaus`.`id`AND datum> '2010-01-01' """
+    WHERE `zeithorizont`>0 AND `neues_kursziel`>0 AND `unternehmen` =103 AND `analyst` = `analyst`.`id` AND `analyst`.`analystenhaus`=`analystenhaus`.`id` """
 sql2 = """SELECT avg,datum FROM unternehmen_avg WHERE unternehmen = 103 ORDER BY datum"""
 
 date1 = datetime.date( 2006, 1, 31 )
@@ -55,7 +55,7 @@ date2 = datetime.date( 2012, 5, 21 )
 
 
 # every 3rd month
-months    = MonthLocator(range(1,13))
+months    = MonthLocator(range(1,13),interval = 3)
 monthsFmt = DateFormatter("%b '%y")
 
 
