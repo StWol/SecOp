@@ -52,6 +52,7 @@ def get_sigma(new_kurs,avg,datum_list):
     MSE = MSE/l
     return np.sqrt(MSE)
 
+
 ################################################################################        
 def prepare_plotting(kurse, avgs, daten,analysten_prognosen_dict,k):
     liste = plot_analyst(kurse, avgs, daten) 
@@ -100,7 +101,7 @@ def plot_analyst(kurse, avg, daten):
     
     color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
     sigma = get_sigma(kurse,avg,daten)
-    if sigma < 10:
+    if sigma < 10 and len(kurse)>4:
         #print sigma
         #print len(kurse)
         ax = fig.add_subplot(111)
@@ -117,16 +118,16 @@ def plot_analyst(kurse, avg, daten):
         return [color,sigma,0]
    
    
-   
-sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = 44  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """
-sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = 44  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """
+cp=input("Für welches Unternehmen?\n")  
+sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """%(cp)
+sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
 """analyst in (779,373, 1661,2125) AND"""
-sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =44 GROUP BY YEAR( `datum` ) , MONTH( `datum` )"
+sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =%d GROUP BY YEAR( `datum` ) , MONTH( `datum` )"%(cp)
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
- WHERE unternehmen =44  
+ WHERE unternehmen =%d  
  AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0 AND zeithorizont>0
- ORDER BY zieldatum"""
+ ORDER BY zieldatum"""%(cp)
 
 avg_kurse = get_select(sql)
 ziel_kurse = get_select(sql3)
@@ -208,22 +209,22 @@ for k,v in analysten_dict.iteritems():
     else:
         continue
 
-for k in analysten_prognosen_dict.keys():
-    if k not in analysten_dict.keys():
-        print "unbekannt: ",k
-        val = analysten_prognosen_dict[k]
-        prognose_kurs=[] 
-        prognose_datum = []
-        color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
-        #sigma_prog = []
-        for i in val:
-            
-            prognose_kurs.append(i[0])
-            prognose_datum.append(i[1])
-         #   sigma_prog.append(1.)
-        #print sigma_prog
-        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
-    
+#for k in analysten_prognosen_dict.keys():
+#    if k not in analysten_dict.keys():
+#        print "unbekannt: ",k
+#        val = analysten_prognosen_dict[k]
+#        prognose_kurs=[] 
+#        prognose_datum = []
+#        color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
+#        #sigma_prog = []
+#        for i in val:
+#            
+#            prognose_kurs.append(i[0])
+#            prognose_datum.append(i[1])
+#         #   sigma_prog.append(1.)
+#        #print sigma_prog
+#        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
+#    
     
 ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)

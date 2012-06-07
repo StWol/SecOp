@@ -88,7 +88,7 @@ def plot_future(prognose_kurs, prognose_datum,color,sigma):
     ax = fig.add_subplot(111)
     #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
     #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
-    ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    #ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
 
     ax.hold(True)
     
@@ -107,21 +107,21 @@ def plot_analyst(kurse, avg, daten):
     sigma = get_sigma(kurse,avg,daten)
     print sigma
     print len(kurse)
-    ax.fill_between(daten, kurse + 1.9600 * sigma, kurse - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    #ax.fill_between(daten, kurse + 1.9600 * sigma, kurse - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
     ax.hold(True)
     return [color,sigma]
    
    
-   
-sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = 4  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """
-sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = 4  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """
+cp=input("Für welches Unternehmen?\n")
+sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """%(cp)
+sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
 
-sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =4 GROUP BY YEAR( `datum` ) , MONTH( `datum` )"
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d  GROUP BY YEAR( `datum` ) , MONTH( `datum` )"%(cp)
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
- WHERE unternehmen = 4
+ WHERE unternehmen = %d
  AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
- ORDER BY zieldatum"""
+ ORDER BY zieldatum"""%(cp)
 
 avg_kurse = get_select(sql)
 ziel_kurse = get_select(sql3)

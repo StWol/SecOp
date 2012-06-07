@@ -196,7 +196,7 @@ for i in einstufung:
     if i[0] == 1:
         buy = buy+1
         try:
-            if trefferquoten_dict[cp][i[1]][0]>5:            
+            #if trefferquoten_dict[cp][i[1]][0]>5:            
                 tr_qt_buy = tr_qt_buy * (trefferquoten_dict[cp][i[1]][2]+1)
                 buy_clean = buy_clean+1
         except: 
@@ -204,7 +204,7 @@ for i in einstufung:
     elif i[0] == 2:
         sell = sell+1
         try:
-            if trefferquoten_dict[cp][i[1]][0]>5:
+            #if trefferquoten_dict[cp][i[1]][0]>5:
                 tr_qt_sell = tr_qt_sell * (trefferquoten_dict[cp][i[1]][2] +1)
                 sell_clean = sell_clean +1
         except:
@@ -212,7 +212,7 @@ for i in einstufung:
     elif i[0] == 3:
         neutral = neutral +1
         try:
-            if trefferquoten_dict[cp][i[1]][0]>5:
+            #if trefferquoten_dict[cp][i[1]][0]>5:
                 tr_qt_neutral = tr_qt_neutral * (trefferquoten_dict[cp][i[1]][2] +1)
                 neutral_clean = neutral_clean+1
         except:
@@ -223,9 +223,19 @@ prozent_buy = (float(buy) / (buy + sell + neutral))*100
 prozent_sell = (float(sell) / (buy + sell + neutral))*100
 prozent_neutral = (float(neutral) / (buy + sell + neutral))*100
 
-t_q_buy = (((float(tr_qt_buy))**(1./buy_clean))-1)*100
-t_q_sell = (((float(tr_qt_sell))**(1./sell_clean))-1)*100
-t_q_neutral = (((float(tr_qt_neutral))**(1./neutral_clean))-1)*100
+try:
+    t_q_buy = (((float(tr_qt_buy))**(1./buy_clean))-1)*100
+except:
+    print "buy_clean = 0"
+try:
+    t_q_sell = (((float(tr_qt_sell))**(1./sell_clean))-1)*100
+except:
+    print "sell_clean = 0"
+
+try:
+    t_q_neutral = (((float(tr_qt_neutral))**(1./neutral_clean))-1)*100
+except:
+    print "neutral_clean = 0"
 
 print "buy: ", buy
 print "sell: " ,sell
