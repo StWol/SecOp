@@ -116,7 +116,7 @@ cp=input("Für welches Unternehmen?\n")
 sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """%(cp)
 sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
 
-sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d  GROUP BY YEAR( `datum` ) , MONTH( `datum` )"%(cp)
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d "%(cp)
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
  WHERE unternehmen = %d

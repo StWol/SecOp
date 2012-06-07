@@ -136,7 +136,7 @@ cp=input("Für welches Unternehmen?\n")
 sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """ %(cp)
 sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """ %(cp)
 
-sql = "SELECT AVG( close ) , `datum` FROM kursdaten WHERE unternehmen =%d GROUP BY YEAR( `datum` ) , MONTH( `datum` )" %(cp)
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d " %(cp)
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
  WHERE unternehmen = %d
@@ -216,9 +216,18 @@ prozent_buy = (float(buy) / (buy + sell + neutral))*100
 prozent_sell = (float(sell) / (buy + sell + neutral))*100
 prozent_neutral = (float(neutral) / (buy + sell + neutral))*100
 
-t_q_buy = (((float(tr_qt_buy))**(1./buy_clean))-1)*100
-t_q_sell = (((float(tr_qt_sell))**(1./sell_clean))-1)*100
-t_q_neutral = (((float(tr_qt_neutral))**(1./neutral_clean))-1)*100
+try:
+    t_q_buy = (((float(tr_qt_buy))**(1./buy_clean))-1)*100
+except:
+    t_q_buy=0
+try:
+    t_q_sell = (((float(tr_qt_sell))**(1./sell_clean))-1)*100
+except:
+    t_q_sell=0
+try:
+    t_q_neutral = (((float(tr_qt_neutral))**(1./neutral_clean))-1)*100
+except:
+    t_q_neutral=0
 
 print "buy: ", buy
 print "sell: " ,sell
