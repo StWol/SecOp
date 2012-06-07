@@ -353,6 +353,7 @@ try:
 except:
     mittel_buy = 0
 
+print 
 
 #print buy
 #print buy_clean
