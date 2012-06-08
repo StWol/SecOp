@@ -42,11 +42,11 @@ def get_select(sql):
         conn.rollback()
         print "Error %d: %s" % (e.args[0], e.args[1])
 
-sql = "SELECT  close, `datum` FROM kursdaten WHERE unternehmen =103  "
+sql = "SELECT  close, `datum` FROM kursdaten WHERE unternehmen =97  "
 sql1 = """SELECT `neues_kursziel`,  `zieldatum`
     FROM `prognose`, `analyst`, `analystenhaus`
-    WHERE `zeithorizont`>0 AND `neues_kursziel`>0 AND `unternehmen` =103 AND `analyst` = `analyst`.`id` AND `analyst`.`analystenhaus`=`analystenhaus`.`id` """
-sql2 = """SELECT avg,datum FROM unternehmen_avg WHERE unternehmen = 103 ORDER BY datum"""
+    WHERE `zeithorizont`>0 AND `neues_kursziel`>0 AND `unternehmen` =97 AND `analyst` = `analyst`.`id` AND `analyst`.`analystenhaus`=`analystenhaus`.`id` """
+sql2 = """SELECT avg,datum FROM unternehmen_avg WHERE unternehmen = 97 ORDER BY datum"""
 
 date1 = datetime.date( 2006, 1, 31 )
 date2 = datetime.date( 2012, 5, 21 )

@@ -161,4 +161,4 @@ SELECT unternehmen FROM analyst_avg_2 WHERE `zieldatum` > '2010-01-01' AND `anal
 ####################################################
 # Trefferquouten nach Unternehmen
 ####################################################
-#start_company()
+#erg = start_company()
