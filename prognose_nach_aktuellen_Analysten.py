@@ -67,7 +67,7 @@ def plot_future(prognose_kurs, prognose_datum,color):
 
     ax.hold(True)
 
-def plot_own_forecast(predictions_mittel_dict,predictions_varianz_dict):
+def plot_own_forecast_points(predictions_mittel_dict,predictions_varianz_dict):
     color = 'green'    
     ax = fig.add_subplot(111)    
     for k in predictions_mittel_dict.keys():
@@ -83,7 +83,7 @@ def plot_own_forecast(predictions_mittel_dict,predictions_varianz_dict):
 
     ax.hold(True)
 
-def plot_endlich(predictions, prognose_datum,sigma):
+def plot_own_forecast_line(predictions, prognose_datum,sigma):
     color = 'green'
     ax = fig.add_subplot(111)
     ax.plot_date(prognose_datum, predictions, '-', color=color,linewidth=1)
@@ -130,7 +130,61 @@ def get_prediction_dictionary(analysten_dict):
             plot_future(prognose_kurs, prognose_datum,'yellow')
     return predictions_dict
 
+
+
+def get_analysten_dict(ziel_kurse):
+    analysten_dict ={}    
+    for row in ziel_kurse:
+        analysten_dict[row[2]] = []
     
+    for row in ziel_kurse:  
+        value = analysten_dict[row[2]]
+        value.append([row[0],row[3] ,dates.date2num(row[1])])
+    return analysten_dict
+    
+
+def get_analysten_prognosen_dict(prognose):
+    analysten_prognosen_dict ={} 
+    for row in prognose:
+        analysten_prognosen_dict[row[2]] = []
+    for row in prognose:  
+        value = analysten_prognosen_dict[row[2]]
+        value.append([row[0],dates.date2num(row[1])])
+    return analysten_prognosen_dict
+    
+def get_predictions_and_dates(predictions_dict):
+    global predictions_mittel_dict
+    global predictions_varianz_dict
+    predictions_and_dates_list = []
+    for k in predictions_dict.keys():
+        mittel = 0
+        count = 0
+        prognosen = []
+        predictions_varianz_dict[k] = []
+        for i in predictions_dict[k]:
+            mittel=mittel+i[0]
+            count = count +1
+            prognosen.append(i[0])
+        mittel = mittel/count
+        Varianz = get_varianz(mittel,prognosen)
+        predictions_mittel_dict[k] = mittel
+        std = math.sqrt(Varianz)
+        predictions_varianz_dict[k] = [Varianz,std]
+        predictions_and_dates_list.append([k,mittel])
+    predictions_and_dates_list.sort()
+    return predictions_and_dates_list
+    
+def get_mittelwert(liste):
+    mittelwert = 0
+    count = 0 
+    for z in liste:
+        mittelwert = mittelwert+z[1]
+        count = count +1
+    mittelwert = mittelwert/count
+    return mittelwert
+
+
+
 cp=input("Für welches Unternehmen?\n")
 sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  """%(cp)
 sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d AND neues_kursziel >0 AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
@@ -142,7 +196,8 @@ sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
  AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
  ORDER BY zieldatum"""%(cp)
 
-
+predictions_mittel_dict = {}
+predictions_varianz_dict={}
 c = 100.
 eps = 0.5
 
@@ -167,30 +222,15 @@ analysten_list = [q[2] for q in ziel_kurse]
 
 
 
-analysten_dict ={}
+analysten_dict = get_analysten_dict(ziel_kurse)
 
-for row in ziel_kurse:
-    analysten_dict[row[2]] = []
-    
-for row in ziel_kurse:  
-    value = analysten_dict[row[2]]
-    value.append([row[0],row[3] ,dates.date2num(row[1])])
+analysten_prognosen_dict = get_analysten_prognosen_dict(prognose)
 
-analysten_prognosen_dict ={} 
 
-for row in prognose:
-    analysten_prognosen_dict[row[2]] = []
-for row in prognose:  
-    value = analysten_prognosen_dict[row[2]]
-    value.append([row[0],dates.date2num(row[1])])
-    
-#date1 = datetime.date( 2006, 1, 31 )
-#date2 = datetime.date( 2012, 5, 21 )
 
+############################################# plot tatsächlichen kurs
 months    = MonthLocator(range(1,13),interval = 3)
 monthsFmt = DateFormatter("%b '%y")
-
-
 fig = figure()
 ax = fig.add_subplot(111)
 ax.xaxis.set_major_locator(months)
@@ -201,46 +241,17 @@ ax.plot_date(datum_avg, avg,'-',color='black',label='tats. Kurs',linewidth=2)
 ax.hold(True)
 
 
-predictions_dict = {}
+
 predictions_dict = get_prediction_dictionary(analysten_dict)
-       
-        
-
-predictions_mittel_dict = {}
-predictions_varianz_dict={}
-predictions_and_dates_list = []
-for k in predictions_dict.keys():
-    mittel = 0
-    count = 0
-    prognosen = []
-    predictions_varianz_dict[k] = []
-    for i in predictions_dict[k]:
-        mittel=mittel+i[0]
-        count = count +1
-        prognosen.append(i[0])
-    mittel = mittel/count
-    Varianz = get_varianz(mittel,prognosen)
-    predictions_mittel_dict[k] = mittel
-    std = math.sqrt(Varianz)
-    predictions_varianz_dict[k] = [Varianz,std]
-    predictions_and_dates_list.append([k,mittel])
-
-
-    
-predictions_and_dates_list.sort()
-mittelwert = 0
-count = 0 
-for z in predictions_and_dates_list:
-    mittelwert = mittelwert+z[1]
-    count = count +1
-mittelwert = mittelwert/count
+predictions_and_dates_list = get_predictions_and_dates(predictions_dict)
+mittelwert = get_mittelwert(predictions_and_dates_list)
 Varianz = get_varianz(mittelwert,[q[1] for q in predictions_and_dates_list])
 sigma = np.sqrt(Varianz)
 
 print "standardabweichung: %s" %(str(sigma))
 
-plot_endlich([q[1] for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list],sigma) 
-plot_own_forecast(predictions_mittel_dict,predictions_varianz_dict)   
+plot_own_forecast_line([q[1] for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list],sigma) 
+plot_own_forecast_points(predictions_mittel_dict,predictions_varianz_dict)   
     
 
 
