@@ -43,7 +43,7 @@ def get_select(sql):
         conn.rollback()
         print "Error %d: %s" % (e.args[0], e.args[1])
 cp=input("Für welches Unternehmen?\n")
-sql = "SELECT  close, `datum` FROM kursdaten WHERE unternehmen =%d  "%(cp)
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum`"%(cp)
 sql1 = """SELECT `neues_kursziel`,  `zieldatum`
     FROM `prognose`, `analyst`, `analystenhaus`
     WHERE `zeithorizont`>0 AND `neues_kursziel`>0 AND `unternehmen` =%d AND `analyst` = `analyst`.`id` AND `analyst`.`analystenhaus`=`analystenhaus`.`id` """ %(cp)

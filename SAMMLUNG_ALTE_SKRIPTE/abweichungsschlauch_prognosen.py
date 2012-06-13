@@ -52,7 +52,6 @@ def get_sigma(new_kurs,avg,datum_list):
     MSE = MSE/l
     return np.sqrt(MSE)
 
-
 ################################################################################        
 def prepare_plotting(kurse, avgs, daten,analysten_prognosen_dict,k):
     liste = plot_analyst(kurse, avgs, daten) 
@@ -64,8 +63,6 @@ def prepare_plotting(kurse, avgs, daten,analysten_prognosen_dict,k):
         plot_future(prognose_kurs, prognose_datum,liste)
 
 
-
-################################################################################    
 def plot_future_unbekannt(prognose_kurs, prognose_datum,color):
     
     ax = fig.add_subplot(111)
@@ -75,11 +72,10 @@ def plot_future_unbekannt(prognose_kurs, prognose_datum,color):
     ax = fig.add_subplot(111)
     #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
     #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
-    #ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    ax.fill_between(prognose_datum, prognose_kurs + 1.9600 * sigma, prognose_kurs - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
 
     ax.hold(True)
     
-
 
 
 ################################################################################    
@@ -100,33 +96,29 @@ def plot_future(prognose_kurs, prognose_datum,color,sigma):
 def plot_analyst(kurse, avg, daten):
     
     color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
+     
+    ax = fig.add_subplot(111)
+    ax.plot_date(daten, kurse, 'o-', color=color)
+
+    ax.hold(True)
+    ax = fig.add_subplot(111)
+    #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
+    #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
     sigma = get_sigma(kurse,avg,daten)
-    if sigma < 10 and len(kurse)>4:
-        #print sigma
-        #print len(kurse)
-        ax = fig.add_subplot(111)
-        ax.plot_date(daten, kurse, 'o-', color=color)
-    
-        ax.hold(True)
-        ax = fig.add_subplot(111)
-        #ax.plot_date(datum_avg,new_kurs -+ 1.9600 * sigma, '-')
-        #ax.fill_between(datum_avg,datum_avg + 1.9600 * sigma, new_kurs - 1.9600 * sigma)
-        ax.fill_between(daten, kurse + 1.9600 * sigma, kurse - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
-        ax.hold(True)
-        return [color,sigma,1]
-    else:
-        return [color,sigma,0]
+    ax.fill_between(daten, kurse + 1.9600 * sigma, kurse - 1.9600 * sigma, alpha=0.35, linestyle='dashed' , color=color)
+    ax.hold(True)
+    return [color,sigma]
    
    
-cp=input("Für welches Unternehmen?\n")  
+cp=input("Für welches Unternehmen?\n")
 sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  AND `zieldatum`> '2010-01-01' ORDER BY avg_datum """%(cp)
 sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum> '2010-01-01' AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
-"""analyst in (779,373, 1661,2125) AND"""
-sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d "%(cp)
+
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum`"%(cp)
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
- WHERE unternehmen =%d  
- AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0 AND zeithorizont>0
+ WHERE unternehmen = %d
+ AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
  ORDER BY zieldatum"""%(cp)
 
 avg_kurse = get_select(sql)
@@ -184,7 +176,6 @@ ax.hold(True)
 ################################################################################
 ### Die Schleife läuft jeden Analysten durch und ruft die methode zum zeichnen auf
 for k,v in analysten_dict.iteritems():
-    
     kurse = [q[0] for q in v]
     avgs = [q[1] for q in v]
     daten = [q[2] for q in v]
@@ -193,45 +184,37 @@ for k,v in analysten_dict.iteritems():
     col_sig_list = plot_analyst(kurse, avgs, daten) 
     color = col_sig_list[0]
     sigma = col_sig_list[1]
-    plotted_or_not = col_sig_list[2]
-    
-    if plotted_or_not == 1:
-        if k in analysten_prognosen_dict.keys():  
-            print "bekannt: " ,k
-            val = analysten_prognosen_dict[k]
-            prognose_kurs=[] 
-            prognose_datum = []
-            for i in val:
-                
-                prognose_kurs.append(i[0])
-                prognose_datum.append(i[1])
-            plot_future(prognose_kurs, prognose_datum,color,sigma)
-    else:
-        continue
+    if k in analysten_prognosen_dict.keys():    
+        val = analysten_prognosen_dict[k]
+        prognose_kurs=[] 
+        prognose_datum = []
+        for i in val:
+            
+            prognose_kurs.append(i[0])
+            prognose_datum.append(i[1])
+        plot_future(prognose_kurs, prognose_datum,color,sigma)
 
-#for k in analysten_prognosen_dict.keys():
-#    if k not in analysten_dict.keys():
-#        print "unbekannt: ",k
-#        val = analysten_prognosen_dict[k]
-#        prognose_kurs=[] 
-#        prognose_datum = []
-#        color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
-#        #sigma_prog = []
-#        for i in val:
-#            
-#            prognose_kurs.append(i[0])
-#            prognose_datum.append(i[1])
-#         #   sigma_prog.append(1.)
-#        #print sigma_prog
-#        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
-#    
+for k in analysten_prognosen_dict.keys():
+    if k not in analysten_dict.keys():
+        print "unbekannt: ",k
+        val = analysten_prognosen_dict[k]
+        prognose_kurs=[] 
+        prognose_datum = []
+        color ='#%02X%02X%02X' % (randrange(0, 255), randrange(0, 255),randrange(0, 255))
+        #sigma_prog = []
+        for i in val:
+            
+            prognose_kurs.append(i[0])
+            prognose_datum.append(i[1])
+         #   sigma_prog.append(1.)
+        #print sigma_prog
+        plot_future_unbekannt(prognose_kurs, prognose_datum,color)
     
 ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
 ax.autoscale_view()    
 ax.grid(True)
 ax.legend(loc='upper left')
-
 fig.autofmt_xdate()
 
 show()

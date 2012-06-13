@@ -183,14 +183,21 @@ def get_mittelwert(liste):
     mittelwert = mittelwert/count
     return mittelwert
 
-
+def get_sigma(new_kurs,avg):
+    """The function to predict."""
+    MSE = 0
+    l = len(new_kurs)
+    for z,j in zip(new_kurs,avg):
+        MSE = MSE + ((z-j)**2)
+    MSE = MSE/l
+    return np.sqrt(MSE)
 
     
 cp=input("Für welches Unternehmen?\n")
 sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  """%(cp)
 sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d AND neues_kursziel >0 AND avg_datum<'2012-01-01' ORDER BY avg_datum, zieldatum """%(cp)
 
-sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d "%(cp)
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum`"%(cp)
 
 sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
  WHERE unternehmen = %d
@@ -211,6 +218,12 @@ avg = [q[0] for q in avg_kurse]
 
 datum_avg = [q[1] for q in avg_kurse]
 datum_avg =dates.date2num(datum_avg)
+
+#beides_datum_avg = []
+#
+#for i in avg_kurse:
+#    beides_datum_avg.append([i[0],dates.date2num(i[1])])
+
 
 datum_ziel = [q[1] for q in ziel_kurse]
 datum_ziel =dates.date2num(datum_ziel)
@@ -244,6 +257,18 @@ Varianz = get_varianz(mittelwert,[q[1] for q in predictions_and_dates_list])
 sigma = np.sqrt(Varianz)
 
 print "standardabweichung: %s" %(str(sigma))
+
+#tats_kurse_MSE = []
+#preds_MSE = []
+#for k in predictions_and_dates_list:
+#    for i in beides_datum_avg: 
+#        if k[1] == i[0]:
+#            tats_kurse_MSE.append(i[1])
+#            preds_MSE.append(k[0])
+#
+#
+#print tats_kurse_MSE
+#print preds_MSE
 
 plot_own_forecast_line([q[1] for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list],sigma) 
 plot_own_forecast_points(predictions_mittel_dict,predictions_varianz_dict)   

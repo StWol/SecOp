@@ -135,9 +135,9 @@ def get_mittelwert(liste):
 
 cp=input("Für welches Unternehmen?\n")
 sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  """%(cp)
-sql_training = """SELECT neues_kursziel, zieldatum,avg FROM analyst_avg_2 WHERE unternehmen = %d AND avg_datum<'2012-03-01'"""%(cp)
+sql_training = """SELECT neues_kursziel, zieldatum,avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum>'2010-01-01'AND avg_datum<'2012-03-01'"""%(cp)
 sql_testing = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum>'2012-03-01' AND avg_datum<(SELECT CURDATE())"""%(cp)
-sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d "%(cp)
+sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum`"%(cp)
 
 sql_prognose = """SELECT neues_kursziel, zieldatum FROM prognose
  WHERE unternehmen = %d
