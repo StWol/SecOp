@@ -278,7 +278,129 @@ def predict_own(data):
 
     
   
+def get_buy_sell_neutral_count_percent_and_mittlere_trefferquoten(einstufung,trefferquoten_dict,cp):
+    buy = 0
+    buy_clean = 0
+    neutral = 0
+    neutral_clean = 0
+    sell = 0
+    sell_clean = 0
+    tr_qt_buy = 1.
+    tr_qt_sell = 1.
+    tr_qt_neutral = 1.
+    
+    result = []
+    
+    for i in einstufung:
+        if i[0] == 1:
+            buy = buy+1
+            try:
+                if trefferquoten_dict[cp][i[1]][0]>3:            
+                    tr_qt_buy = tr_qt_buy * (trefferquoten_dict[cp][i[1]][2]+1)
+                    buy_clean = buy_clean+1
+            except: 
+                continue
+        elif i[0] == 2:
+            sell = sell+1
+            try:
+                if trefferquoten_dict[cp][i[1]][0]>3:
+                    tr_qt_sell = tr_qt_sell * (trefferquoten_dict[cp][i[1]][2] +1)
+                    sell_clean = sell_clean +1
+            except:
+                continue
+        elif i[0] == 3:
+            neutral = neutral +1
+            try:
+                if trefferquoten_dict[cp][i[1]][0]>3:
+                    tr_qt_neutral = tr_qt_neutral * (trefferquoten_dict[cp][i[1]][2] +1)
+                    neutral_clean = neutral_clean+1
+            except:
+                continue
+    
+    prozent_buy = (float(buy) / (buy + sell + neutral))*100
+    prozent_sell = (float(sell) / (buy + sell + neutral))*100
+    prozent_neutral = (float(neutral) / (buy + sell + neutral))*100
+    
+    try:
+        t_q_buy = (((float(tr_qt_buy))**(1./buy_clean))-1)*100
+    except:
+        t_q_buy=0
+    try:
+        t_q_sell = (((float(tr_qt_sell))**(1./sell_clean))-1)*100
+    except:
+        t_q_sell=0
+    try:
+        t_q_neutral = (((float(tr_qt_neutral))**(1./neutral_clean))-1)*100
+    except:
+        t_q_neutral=0
+        
+    result.append([[buy,prozent_buy,t_q_buy],[sell,prozent_sell,t_q_sell],[neutral,prozent_neutral,t_q_neutral]])
+    
+    return result
     
     
+def get_colored_trend_prognosis(analysten_prognosen_dict,datum_prognose):
+    result = []    
+    mittel_buy = 0.
+    mittel_sell = 0.
+    mittel_neutral = 0.
+    count_buy = 0.
+    count_sell = 0.
+    count_neutral = 0. 
+    prognose_buy = []
+    prognose_sell = []
+    prognose_neutral = []
+    
+    datum_buy = []
+    datum_sell = []
+    datum_neutral = []
+    for k in analysten_prognosen_dict.keys():
+        val = analysten_prognosen_dict[k]
+        for i in val:
+            if i[2] == 1.:        
+                mittel_buy += i[0]
+                count_buy += 1
+                prognose_buy.append(i[0])
+                datum_buy.append(i[1])
+                
+            elif i[2] == 2.:
+                mittel_sell += i[0]
+                count_sell += 1
+                prognose_sell.append(i[0])
+                datum_sell.append(i[1])
+                
+            elif i[2]== 3.:
+                mittel_neutral += i[0]
+                count_neutral += 1
+                prognose_neutral.append(i[0])
+                datum_neutral.append(i[1])
+            else:
+                continue
+    try:
+        mittel_neutral = float(mittel_neutral)/count_neutral
+    except:
+        mittel_neutral = 0
+    try:
+        mittel_sell = float(mittel_sell)/count_sell
+    except:
+        mittel_sell = 0
+    try:
+        mittel_buy = float(mittel_buy)/count_buy
+    except:
+        mittel_buy = 0
+    
+    arith_mittel_buy=[]
+    arith_mittel_sell=[]
+    arith_mittel_neutral=[]
+    for i in range(0,len(datum_prognose)):
+        arith_mittel_buy.append(mittel_buy) 
+        arith_mittel_sell.append(mittel_sell)
+        arith_mittel_neutral.append(mittel_neutral)
+
+    result.append([[prognose_buy,dates.num2date(datum_buy)],[prognose_sell,dates.num2date(datum_sell)],[prognose_neutral,dates.num2date(datum_neutral)],[arith_mittel_buy,dates.num2date(datum_prognose)],[arith_mittel_sell,dates.num2date(datum_prognose)],[arith_mittel_neutral,dates.num2date(datum_prognose)]])                
+    return result
+    
+    
+
     
     

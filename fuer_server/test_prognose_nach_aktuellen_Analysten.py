@@ -60,7 +60,7 @@ def main(cp,conn,cursor):
     
     konfidenz_intervall_95_sigma_oben = [[(q[1]+ 1.9600 * standardabweichung) for q in predictions_and_dates_list], [dates.num2date(q[0]) for q in predictions_and_dates_list]]
     konfidenz_intervall_95_sigma_unten = [[(q[1]- 1.9600 * standardabweichung) for q in predictions_and_dates_list], [dates.num2date(q[0]) for q in predictions_and_dates_list]]
-    tats_kurse_datum = [datum_avg,avg]
+    tats_kurse_datum = [dates.num2date(datum_avg),avg]
     prognosekurse_analysten_datum = [q[0] for q in data_plot_future], [dates.num2date(q[1]) for q in data_plot_future]
     unsere_vorhersage_linie = [q[1] for q in predictions_and_dates_list], [dates.num2date(q[0]) for q in predictions_and_dates_list]
     unsere_vorhersage_punkte = [[q[0] for q in data_plot_own_forecast_ponts],[dates.num2date(q[1]) for q in data_plot_own_forecast_ponts]]

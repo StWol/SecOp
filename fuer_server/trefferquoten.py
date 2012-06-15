@@ -12,22 +12,9 @@ from matplotlib.dates import MonthLocator, DateFormatter
 from matplotlib import dates
 from random import randrange
 
-try:
-    conn = MySQLdb.connect (host="141.62.65.151",
-                            user = "stan",
-                            passwd = "money!",
-                            db = "secop")
-                      
-    print "Mit secop verbunden"
-                            
-except MySQLdb.Error, e:
-    print "Error %d: %s" % (e.args[0], e.args[1])
-
-    
-cursor = conn.cursor ()
 
 ################################################################################
-def get_select(sql):
+def get_select(sql,cursor,conn):
     result = []
     try:
         cursor.execute(sql)
@@ -97,13 +84,13 @@ def start_analyst():
     #################################################################################
     ##################################################################################
 
-def start_company():
+def start_company(cp,conn,cursor):
     ####################################################
     # Trefferquouten nach Unternehmen
     ####################################################
-    treffer = get_select(sql4)
-    gesamt = get_select(sql3)
-    unternehmen = get_select(sql5)
+    treffer = get_select(sql4,cursor,conn)
+    gesamt = get_select(sql3,cursor,conn)
+    unternehmen = get_select(sql5,cursor,conn)
 
     unternehmen_dict ={}
     

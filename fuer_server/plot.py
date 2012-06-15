@@ -81,7 +81,7 @@ def plot_own_forecast_line_2(predictions, prognose_datum,sigma,color,ax,fig):
 def plot_future_unbekannt(prognose_kurs, prognose_datum,color,ax,fig):
     
     ax = fig.add_subplot(111)
-    ax.plot_date(prognose_datum, prognose_kurs, 'o-', color=color)
+    ax.plot_date(prognose_datum, prognose_kurs, 'o', color=color)
 
     ax.hold(True)
     ax = fig.add_subplot(111)
@@ -125,6 +125,14 @@ def plot_analyst_if(kurse, avg, daten,ax,fig):
         return [color,sigma,0]
 
 
+def plot_trend(prognose_datum,last_kurs,color,ax,fig):
+    trend = []
+    for i in range(0,len(prognose_datum)):
+        trend.append(last_kurs)
+    ax = fig.add_subplot(111)
+    ax.plot_date(prognose_datum, trend, '-', color=color,linewidth=4 )
+    ax.hold(True)
+    ax = fig.add_subplot(111)
 
 
 def plot_own_forecast_line(predictions, prognose_datum,sigma,ax,fig):
