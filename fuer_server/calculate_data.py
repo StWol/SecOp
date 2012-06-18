@@ -11,7 +11,10 @@ import MySQLdb
 import numpy as np
 from matplotlib import dates
 from random import randrange
+from db_connector import Connector
 
+
+connector = Connector()
 
 predictions_mittel_dict = {}
 predictions_varianz_dict={}
@@ -48,20 +51,6 @@ def reset_global_variables():
     del forecast_predictions_and_dates_list
     del clf
 
-
-def get_select(sql,cursor,conn):
-    result = []
-    try:
-        cursor.execute(sql)
-        conn.commit()
-        result = cursor.fetchall()
-        result = np.array(result)
-        #result = np.transpose(result)
-        return result
-        
-    except MySQLdb.Error, e:
-        conn.rollback()
-        print "Error %d: %s" % (e.args[0], e.args[1])
         
 def get_varianz(mittel,prognosen):
     """The function to predict."""

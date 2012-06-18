@@ -4,30 +4,9 @@ Created on Mon May 14 21:21:48 2012
 
 @author: Philipp
 """
-import datetime
-import MySQLdb
-import numpy as np
-from pylab import figure, show
-from matplotlib.dates import MonthLocator, DateFormatter
-from matplotlib import dates
-from random import randrange
-
-
-################################################################################
-def get_select(sql,cursor,conn):
-    result = []
-    try:
-        cursor.execute(sql)
-        conn.commit()
-        result = cursor.fetchall()
-        result = np.array(result)
-        #result = np.transpose(result)
-        return result
-        
-    except MySQLdb.Error, e:
-        conn.rollback()
-        print "Error %d: %s" % (e.args[0], e.args[1])
-
+from db_connector import Connector
+  
+connector = Connector()
 
 
 def get_Analyst_quote(treffer,gesamt):
@@ -74,8 +53,8 @@ def start_analyst():
     ####################################################
     # Gesamt Trefferquoute der Analysten ermitteln
     ####################################################
-    treffer = get_select(sql)
-    gesamt = get_select(sql2)
+    treffer = connector.get_select(sql)
+    gesamt = connector.get_select(sql2)
 
     # trefferquote_nach_analyst_dict auf folgende form bringen:
     # {id_des_Analysten: [gesamtanzahl_an_Prognosen, treffer, trefferquote]}
@@ -84,13 +63,13 @@ def start_analyst():
     #################################################################################
     ##################################################################################
 
-def start_company(cp,conn,cursor):
+def start_company(cp):
     ####################################################
     # Trefferquouten nach Unternehmen
     ####################################################
-    treffer = get_select(sql4,cursor,conn)
-    gesamt = get_select(sql3,cursor,conn)
-    unternehmen = get_select(sql5,cursor,conn)
+    treffer = connector.get_select(sql4)
+    gesamt = connector.get_select(sql3)
+    unternehmen = connector.get_select(sql5)
 
     unternehmen_dict ={}
     
@@ -105,37 +84,48 @@ def start_company(cp,conn,cursor):
 
 
 ### Analyst <-> anzahl richtiger Prognosen
-sql="""SELECT `analyst_avg_2`.`analyst`,
-COUNT(`analyst_avg_2`.`analyst`) 
-FROM `analyst_avg_2`
-WHERE  `analyst_avg_2`.`kurs_bei_veroeffentlichung`>0 AND `analyst_avg_2`.`zieldatum` > '2010-01-01'
-AND((`analyst_avg_2`.`neue_einstufung`=1 AND (((avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) > 2)
-OR (`analyst_avg_2`.`neue_einstufung`=2 AND (((avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) < -2)
-OR (`analyst_avg_2`.`neue_einstufung`=3 AND (((avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) > -2 
-	AND (((`analyst_avg_2`.avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) < 2)) GROUP BY `analyst_avg_2`.`analyst`
- """
+sql = """SELECT `analyst_id`, COUNT(`analyst_id`) 
+        FROM `analyst_avg_2`
+        WHERE `publishing_price` > 0 
+        AND `target_date` > '2010-01-01'
+        AND((`new_ranking_id` = 1 AND (((avg -  `publishing_price`) /  `publishing_price` ) * 100) > 2)
+        OR (`new_ranking_id` = 2 AND (((avg -  `publishing_price`) /  `publishing_price` ) * 100) < -2)
+        OR (`new_ranking_id` = 3 AND (((avg -  `publishing_price`) /  `publishing_price` ) * 100) > -2 
+        AND ((( avg - `publishing_price`) /  `publishing_price` ) * 100) < 2)) 
+        GROUP BY  `analyst_id` """
 
 
 #### Analyst <-> anzahl der Prognosen   
-sql2 = """
-SELECT `analyst`,COUNT(*), unternehmen FROM analyst_avg_2 WHERE `zieldatum` > '2010-01-01' AND `analyst_avg_2`.`kurs_bei_veroeffentlichung`>0 GROUP BY analyst 
-"""
+sql2 = """SELECT `analyst_id`, COUNT(*), `company_id` 
+        FROM analyst_avg_2 
+        WHERE `target_date` > '2010-01-01' 
+        AND `publishing_price` > 0 
+        GROUP BY `analyst_id`"""
 
-sql3 ="""
-SELECT `analyst`,COUNT(*), unternehmen FROM analyst_avg_2 WHERE `zieldatum` > '2010-01-01' AND `analyst_avg_2`.`kurs_bei_veroeffentlichung`>0 GROUP BY analyst,unternehmen 
-"""
-sql4="""SELECT `analyst_avg_2`.`analyst`,
-COUNT(`analyst_avg_2`.`analyst`) , unternehmen
-FROM `analyst_avg_2`
-WHERE  `analyst_avg_2`.`kurs_bei_veroeffentlichung`>0 AND `analyst_avg_2`.`zieldatum` > '2010-01-01'
-AND((`analyst_avg_2`.`neue_einstufung`=1 AND (((avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) > 2)
-OR (`analyst_avg_2`.`neue_einstufung`=2 AND (((avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) < -2)
-OR (`analyst_avg_2`.`neue_einstufung`=3 AND (((avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) > -2 
-	AND (((`analyst_avg_2`.avg - `analyst_avg_2`.`kurs_bei_veroeffentlichung`)/ `analyst_avg_2`.`kurs_bei_veroeffentlichung` )*100) < 2)) GROUP BY `analyst_avg_2`.`analyst`,`analyst_avg_2`.`unternehmen`
- """
-sql5 ="""
-SELECT unternehmen FROM analyst_avg_2 WHERE `zieldatum` > '2010-01-01' AND `analyst_avg_2`.`kurs_bei_veroeffentlichung`>0 GROUP BY unternehmen 
-"""
+
+sql3 ="""SELECT `analyst_id`,COUNT(*), `company_id` 
+        FROM analyst_avg_2 
+        WHERE `target_date` > '2010-01-01' 
+        AND `publishing_price` > 0 
+        GROUP BY `analyst_id`, `company_id`"""
+
+
+sql4="""SELECT `analyst_id`, COUNT(`analyst_id`), `company_id`
+        FROM `analyst_avg_2`
+        WHERE `publishing_price`>0 
+        AND `target_date` > '2010-01-01'
+        AND((`new_ranking_id`= 1 AND (((avg -  `publishing_price`) /  `publishing_price` ) * 100) > 2)
+        OR (`new_ranking_id`= 2 AND (((avg -  `publishing_price`) /  `publishing_price` ) * 100) < -2)
+        OR (`new_ranking_id`= 3 AND (((avg -  `publishing_price`) /  `publishing_price` ) * 100) > -2 
+        AND (((avg - `publishing_price`) /  `publishing_price` ) * 100) < 2)) 
+        GROUP BY  `analyst_id`, `company_id`"""
+        
+        
+sql5 ="""SELECT `company_id` 
+        FROM `analyst_avg_2` 
+        WHERE `target_date` > '2010-01-01' 
+        AND `publishing_price`>0 
+        GROUP BY `company_id`"""
 
 
 ####################################################

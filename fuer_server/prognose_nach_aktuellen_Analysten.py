@@ -5,25 +5,36 @@ Created on Mon May 14 21:21:48 2012
 @author: Philipp
 """
 import numpy as np
-from matplotlib import dates
 import calculate_data as calculate_data
-import plot as plot
+from matplotlib import dates
+from db_connector import Connector
+  
+connector = Connector()
 
-
-def main(cp,conn,cursor):
-    sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d AND neues_kursziel >0 AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
+def main(cp):
+    sql3 = """SELECT `new_price`, `target_date`, `analyst_id`, `avg` 
+            FROM analyst_avg_2  
+            WHERE `company_id`= %d 
+            AND `new_price`>0 
+            AND `avg_date`<(SELECT CURDATE()) 
+            ORDER BY `avg_date`, `target_date`"""%(cp)    
     
-    sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum"%(cp)
+    sql = """SELECT `closing_price`, `date` 
+            FROM secop_quote 
+            WHERE `company_id`=%d 
+            ORDER BY `date`"""%(cp)
     
-    sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
-     WHERE unternehmen = %d
-     AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
-     ORDER BY zieldatum"""%(cp)
+    sql4 = """SELECT `new_price`, `target_date`, `analyst_id`
+            FROM secop_prediction
+            WHERE `company_id`= %d
+            AND `target_date`>(SELECT CURDATE()) 
+            AND `new_price`>0
+            ORDER BY `target_date`"""%(cp)
     
     
-    avg_kurse = calculate_data.get_select(sql,cursor,conn)
-    ziel_kurse = calculate_data.get_select(sql3,cursor,conn)
-    prognose = calculate_data.get_select(sql4,cursor,conn)
+    avg_kurse = connector.get_select(sql)
+    ziel_kurse = connector.get_select(sql3)
+    prognose = connector.get_select(sql4)
     
     avg = [q[0] for q in avg_kurse]
     

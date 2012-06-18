@@ -7,28 +7,42 @@ Created on Mon May 14 21:21:48 2012
 import numpy as np
 from matplotlib import dates
 import calculate_data as calculate_data
-import plot as plot
-from pylab import figure
+from db_connector import Connector
+  
+connector = Connector()
 
-
-def main(cp,conn,cursor):
-    sql_training = """SELECT neues_kursziel, zieldatum,avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum>'2010-01-01'AND avg_datum<'2012-03-01'"""%(cp)
-    sql_testing = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d  AND avg_datum>'2012-03-01' AND avg_datum<(SELECT CURDATE())"""%(cp)
-    sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum"%(cp)
+def main(cp):
+    sql_training = """SELECT `new_price`, `target_date`,`avg` 
+            FROM `analyst_avg_2` 
+            WHERE `company_id` = %d  
+            AND `avg_date` > '2010-01-01' 
+            AND `avg_date` < '2012-03-01'"""%(cp)
+            
+    sql_testing = """SELECT `new_price`, `target_date`, `analyst_id`, `avg` 
+            FROM `analyst_avg_2`  
+            WHERE `company_id` = %d  
+            AND `avg_date` > '2012-03-01'
+            AND `avg_date` < (SELECT CURDATE())"""%(cp)
+            
+    sql = """SELECT `closing_price`, `date` 
+            FROM secop_quote 
+            WHERE `company_id`=%d 
+            ORDER BY `date`"""%(cp)
     
-    sql_prognose = """SELECT neues_kursziel, zieldatum FROM prognose
-     WHERE unternehmen = %d
-     AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
-     """%(cp)
+    sql_prognose = """SELECT `new_price`, `target_date`
+            FROM `secop_prediction`
+            WHERE `company_id` = %d
+            AND `target_date` > (SELECT CURDATE())
+            AND `new_price` > 0"""%(cp)
     
     
     #fig = figure()
     #ax = fig.add_subplot(111)    
     
-    avg_kurse = calculate_data.get_select(sql,cursor,conn)
-    kurse_training = calculate_data.get_select(sql_training,cursor,conn)
-    kurse_testing = calculate_data.get_select(sql_testing,cursor,conn)
-    prognose = calculate_data.get_select(sql_prognose,cursor,conn)
+    avg_kurse = connector.get_select(sql)
+    kurse_training = connector.get_select(sql_training)
+    kurse_testing = connector.get_select(sql_testing)
+    prognose = connector.get_select(sql_prognose)
     
     avg = [q[0] for q in avg_kurse]
     datum_avg = [q[1] for q in avg_kurse]

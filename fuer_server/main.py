@@ -5,7 +5,6 @@ Created on Tue Jun 12 20:02:38 2012
 @author: Philipp
 """
 from matplotlib import dates
-import MySQLdb
 import plot as plot
 import prognose_nach_aktuellen_Analysten as prognose_nach_aktuellen_Analysten
 import test_prognose_nach_aktuellen_Analysten as test_prognose_nach_aktuellen_Analysten
@@ -17,31 +16,16 @@ import Stimmungsbarometer as Stimmungsbarometer
 
 
 def just_do_it(cp):
-    
-####################################
-# datenbank connection herstellen
-###################################
-    try:
-        conn = MySQLdb.connect (host="141.62.65.151",
-                                user = "stan",
-                                passwd = "money!",
-                                db = "secop")
-                          
-        print "Mit secop verbunden"
-                                
-    except MySQLdb.Error, e:
-        print "Error %d: %s" % (e.args[0], e.args[1])
-    cursor = conn.cursor ()
 
 ###############################################################################
 # Stimmungsbarometer holen, auspacken und zeichnen
 ###############################################################################    
-    Stimmungsbarometer.main(cp,conn,cursor)
+    Stimmungsbarometer.main(cp)
     
     fig = figure()
     ax = fig.add_subplot(111)
     
-    result_set_stimmung = Stimmungsbarometer.main(cp,conn,cursor)
+    result_set_stimmung = Stimmungsbarometer.main(cp)
     
     datum_tats_kurse = result_set_stimmung[0][0]
     tats_kurse = result_set_stimmung[0][1]
@@ -113,7 +97,7 @@ def just_do_it(cp):
     fig = figure()
     ax = fig.add_subplot(111)    
     
-    result_set_prog_ind_analyst = prognose_nach_aktuellen_Analysten.main(cp,conn,cursor)    
+    result_set_prog_ind_analyst = prognose_nach_aktuellen_Analysten.main(cp)    
     
     konfidenz_intervall_95_sigma_oben = result_set_prog_ind_analyst[0][0] 
     datum_konfidenz_intervall_95_sigma_oben = result_set_prog_ind_analyst[0][1]
@@ -144,7 +128,7 @@ def just_do_it(cp):
     fig = figure()
     ax = fig.add_subplot(111)    
     
-    result_set_test_prog_ind_analyst = test_prognose_nach_aktuellen_Analysten.main(cp,conn,cursor)    
+    result_set_test_prog_ind_analyst = test_prognose_nach_aktuellen_Analysten.main(cp)    
     
     konfidenz_intervall_95_sigma_oben = result_set_test_prog_ind_analyst[0][0] 
     datum_konfidenz_intervall_95_sigma_oben = result_set_test_prog_ind_analyst[0][1]
@@ -176,7 +160,7 @@ def just_do_it(cp):
     fig = figure()
     ax = fig.add_subplot(111)
     
-    result_set_alle_analysten = prognose_nach_saemtlichen_prognosen_aller_Analysten_ab_2010.main(cp,conn,cursor)
+    result_set_alle_analysten = prognose_nach_saemtlichen_prognosen_aller_Analysten_ab_2010.main(cp)
     
     training_konfidenz_intervall_95_sigma_oben_kurse = result_set_alle_analysten[0][0]
     training_konfidenz_intervall_95_sigma_oben_datum = result_set_alle_analysten[0][1]

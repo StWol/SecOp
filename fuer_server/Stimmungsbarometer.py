@@ -8,31 +8,40 @@ import numpy as np
 from matplotlib import dates
 import calculate_data as calculate_data
 import trefferquoten as tq
+from db_connector import Connector
+  
 
-   
+connector = Connector()
 
-def main(cp,conn,cursor):    
-    sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum`" %(cp)
+def main(cp):    
+    sql = """SELECT `closing_price`, `date` 
+            FROM secop_quote 
+            WHERE `company_id`=%d 
+            ORDER BY `date`""" %(cp)
     
-    sql4 = """SELECT neues_kursziel, zieldatum, analyst,neue_einstufung FROM prognose
-     WHERE unternehmen = %d
-     AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
-     ORDER BY zieldatum""" %(cp)
+    sql4 = """SELECT `new_price`, `target_date`, `analyst_id`, `new_ranking_id` 
+            FROM secop_prediction
+            WHERE `company_id`= %d
+            AND `target_date`>(SELECT CURDATE()) 
+            AND `new_price` >0
+            ORDER BY `target_date`""" %(cp)
      
      
-    sql5 = """SELECT neue_einstufung,analyst FROM prognose
-     WHERE unternehmen = %d
-     AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
-     ORDER BY zieldatum""" %(cp)
+    sql5 = """SELECT `new_ranking_id`,`analyst_id`
+            FROM secop_prediction
+            WHERE `company_id`= %d
+            AND `target_date`>(SELECT CURDATE()) 
+            AND `new_price`>0
+            ORDER BY `target_date`""" %(cp)
     
     
     
-    trefferquoten_dict = tq.start_company(cp,conn,cursor)
+    trefferquoten_dict = tq.start_company(cp)
     
     
-    avg_kurse = calculate_data.get_select(sql,cursor,conn)
-    prognose = calculate_data.get_select(sql4,cursor,conn)
-    einstufung = calculate_data.get_select(sql5,cursor,conn)
+    avg_kurse = connector.get_select(sql)
+    prognose = connector.get_select(sql4)
+    einstufung = connector.get_select(sql5)
     avg = [q[0] for q in avg_kurse]
     
     datum_avg = [q[1] for q in avg_kurse]
