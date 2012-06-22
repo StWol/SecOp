@@ -4,8 +4,6 @@ Created on Mon May 14 21:21:48 2012
 
 @author: Philipp
 """
-import numpy as np
-from matplotlib import dates
 import calculate_data as calculate_data
 import trefferquoten as tq
 from db_connector import Connector
@@ -45,11 +43,11 @@ def main(cp):
     avg = [q[0] for q in avg_kurse]
     
     datum_avg = [q[1] for q in avg_kurse]
-    datum_avg =dates.date2num(datum_avg)
+    #datum_avg =dates.date2num(datum_avg)
     
     
     datum_prognose = [q[1] for q in prognose]
-    datum_prognose = dates.date2num(datum_prognose)
+    #datum_prognose = dates.date2num(datum_prognose)
     
     analysten_prognosen_dict ={} 
     
@@ -60,13 +58,15 @@ def main(cp):
     
     for row in prognose:  
         value = analysten_prognosen_dict[row[2]]
-        value.append([row[0],dates.date2num(row[1]), row[3]])    
+        #value.append([row[0],dates.date2num(row[1]), row[3]])
+        value.append([row[0],row[1], row[3]])
     
     buy_sell_neutral_count_percent_and_mittlere_trefferquoten = calculate_data.get_buy_sell_neutral_count_percent_and_mittlere_trefferquoten(einstufung,trefferquoten_dict,cp)   
 # [buy,prozent_buy,tr_qt_buy],[sell,prozent_sell,tr_qt_sell],[neutral,prozent_neutral,tr_qt_neutral]
     
     colored_trend_prognosis = calculate_data.get_colored_trend_prognosis(analysten_prognosen_dict,datum_prognose)
-    tats_kurse_datum = [dates.num2date(datum_avg),avg]
+    #tats_kurse_datum = [dates.num2date(datum_avg),avg]
+    tats_kurse_datum = [datum_avg,avg]
      
     result_set = []
     result_set.append(tats_kurse_datum)

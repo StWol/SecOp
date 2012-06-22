@@ -6,7 +6,6 @@ Created on Mon May 14 21:21:48 2012
 """
 import numpy as np
 import calculate_data as calculate_data
-from matplotlib import dates
 from db_connector import Connector
   
 connector = Connector()
@@ -39,13 +38,6 @@ def main(cp):
     avg = [q[0] for q in avg_kurse]
     
     datum_avg = [q[1] for q in avg_kurse]
-    datum_avg =dates.date2num(datum_avg)
-    
-    datum_ziel = [q[1] for q in ziel_kurse]
-    datum_ziel =dates.date2num(datum_ziel)
-    
-    datum_prognose = [q[1] for q in prognose]
-    datum_prognose = dates.date2num(datum_prognose)
     
     
     analysten_dict = calculate_data.get_analysten_dict(ziel_kurse)
@@ -61,20 +53,14 @@ def main(cp):
     
     data_plot_future = calculate_data.get_data_for_plot_future(analysten_dict,analysten_prognosen_dict)
     data_plot_own_forecast_ponts = calculate_data.get_data_for_plot_own_forecast_points()
-#    fig = figure()
-#    ax = fig.add_subplot(111)
-#    plot.plot_avg(datum_avg,avg,ax,fig)
-#    plot.plot_future([q[0] for q in data_plot_future], [q[1] for q in data_plot_future],'yellow',ax,fig)
-#    plot.plot_own_forecast_line([q[1] for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list],sigma,ax,fig) 
-#    plot.plot_own_forecast_points([q[0] for q in data_plot_own_forecast_ponts],[q[1] for q in data_plot_own_forecast_ponts],ax,fig)   
-#    plot.show_plot(ax,fig)
     
-    konfidenz_intervall_95_sigma_oben = [[(q[1]+ 1.9600 * sigma) for q in predictions_and_dates_list], [dates.num2date(q[0]) for q in predictions_and_dates_list]]
-    konfidenz_intervall_95_sigma_unten = [[(q[1]- 1.9600 * sigma) for q in predictions_and_dates_list], [dates.num2date(q[0]) for q in predictions_and_dates_list]]
-    tats_kurse_datum = [dates.num2date(datum_avg),avg]
-    prognosekurse_analysten_datum = [q[0] for q in data_plot_future], [dates.num2date(q[1]) for q in data_plot_future]
-    unsere_vorhersage_linie = [q[1] for q in predictions_and_dates_list], [dates.num2date(q[0]) for q in predictions_and_dates_list]
-    unsere_vorhersage_punkte = [[q[0] for q in data_plot_own_forecast_ponts],[dates.num2date(q[1]) for q in data_plot_own_forecast_ponts]]
+
+    konfidenz_intervall_95_sigma_oben = [[(q[1]+ 1.9600 * sigma) for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list]]
+    konfidenz_intervall_95_sigma_unten = [[(q[1]- 1.9600 * sigma) for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list]]
+    tats_kurse_datum = [datum_avg,avg]
+    prognosekurse_analysten_datum = [q[0] for q in data_plot_future], [q[1] for q in data_plot_future]
+    unsere_vorhersage_linie = [q[1] for q in predictions_and_dates_list], [q[0] for q in predictions_and_dates_list]
+    unsere_vorhersage_punkte = [[q[0] for q in data_plot_own_forecast_ponts],[q[1] for q in data_plot_own_forecast_ponts]]
     
     result_set = []
     result_set.append(konfidenz_intervall_95_sigma_oben)
@@ -84,9 +70,7 @@ def main(cp):
     result_set.append(unsere_vorhersage_linie)
     result_set.append(unsere_vorhersage_punkte)
     result_set.append(sigma)
-    
-    
-    
+
     calculate_data.reset_global_variables()
     calculate_data.initialize_global_variables()
     return result_set

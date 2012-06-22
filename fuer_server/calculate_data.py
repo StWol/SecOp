@@ -7,9 +7,8 @@ Created on Tue Jun 12 19:59:51 2012
 
 import math
 from sklearn import *
-import MySQLdb
 import numpy as np
-from matplotlib import dates
+#from matplotlib import dates
 from random import randrange
 from db_connector import Connector
 
@@ -147,7 +146,8 @@ def get_analysten_dict(ziel_kurse):
     
     for row in ziel_kurse:  
         value = analysten_dict[row[2]]
-        value.append([row[0],row[3] ,dates.date2num(row[1])])
+        #value.append([row[0],row[3] ,dates.date2num(row[1])])
+        value.append([row[0],row[3] ,row[1]])
     return analysten_dict
     
 
@@ -157,7 +157,8 @@ def get_analysten_prognosen_dict(prognose):
         analysten_prognosen_dict[row[2]] = []
     for row in prognose:  
         value = analysten_prognosen_dict[row[2]]
-        value.append([row[0],dates.date2num(row[1])])
+        #value.append([row[0],dates.date2num(row[1])])
+        value.append([row[0],row[1]])
     return analysten_prognosen_dict
     
 def get_predictions_and_dates(predictions_dict):
@@ -205,7 +206,8 @@ def get_mittelwert_2(liste):
 def get_data_test_MSE(data_plot_own_forecast_ponts,avg_kurse):
     std_test =[]
     for i,j in zip([q[0] for q in data_plot_own_forecast_ponts],[q[1] for q in data_plot_own_forecast_ponts]):
-        for z,x in zip(dates.date2num([q[1] for q in avg_kurse]),[q[0] for q in avg_kurse]):
+        #for z,x in zip(dates.date2num([q[1] for q in avg_kurse]),[q[0] for q in avg_kurse]):
+        for z,x in zip([q[1] for q in avg_kurse],[q[0] for q in avg_kurse]):    
             if i == z:
                 std_test.append([j,x])
     return std_test
@@ -225,7 +227,8 @@ def train_machine(kurse_training):
     global training_predictions_and_dates_list
     training_predictions_and_dates_list = []
     for i in kurse_training:
-        training_predictions_and_dates_list.append([dates.date2num(i[1]),i[2],i[0]])
+        #training_predictions_and_dates_list.append([dates.date2num(i[1]),i[2],i[0]])
+        training_predictions_and_dates_list.append([i[1],i[2],i[0]])
     training_predictions_and_dates_list.sort()
     trainya = np.array([q[2] for q in training_predictions_and_dates_list])
     trainya=np.resize(trainya,(len(trainya),1))
@@ -242,7 +245,8 @@ def get_testing_data(kurse_testing):
     global testing_predictions_and_dates_list
     testing_predictions_and_dates_list = []
     for i in kurse_testing:
-        testing_predictions_and_dates_list.append([dates.date2num(i[1]),i[3],i[0]])
+        #testing_predictions_and_dates_list.append([dates.date2num(i[1]),i[3],i[0]])
+        testing_predictions_and_dates_list.append([i[1],i[3],i[0]])
     testing_predictions_and_dates_list.sort()
     testinya = np.array([q[2] for q in testing_predictions_and_dates_list])
     testinya=np.resize(testinya,(len(testinya),1))
@@ -252,7 +256,8 @@ def get_future_data(prognose):
     global forecast_predictions_and_dates_list 
     forecast_predictions_and_dates_list = []
     for i in prognose:
-        forecast_predictions_and_dates_list.append([dates.date2num(i[1]),i[0]])
+        #forecast_predictions_and_dates_list.append([dates.date2num(i[1]),i[0]])
+        forecast_predictions_and_dates_list.append([i[1],i[0]])
     
     forecast_predictions_and_dates_list.sort()
     prognose_kurs=np.array(forecast_predictions_and_dates_list)
@@ -386,7 +391,8 @@ def get_colored_trend_prognosis(analysten_prognosen_dict,datum_prognose):
         arith_mittel_sell.append(mittel_sell)
         arith_mittel_neutral.append(mittel_neutral)
 
-    result.append([[prognose_buy,dates.num2date(datum_buy)],[prognose_sell,dates.num2date(datum_sell)],[prognose_neutral,dates.num2date(datum_neutral)],[arith_mittel_buy,dates.num2date(datum_prognose)],[arith_mittel_sell,dates.num2date(datum_prognose)],[arith_mittel_neutral,dates.num2date(datum_prognose)]])                
+    #result.append([[prognose_buy,dates.num2date(datum_buy)],[prognose_sell,dates.num2date(datum_sell)],[prognose_neutral,dates.num2date(datum_neutral)],[arith_mittel_buy,dates.num2date(datum_prognose)],[arith_mittel_sell,dates.num2date(datum_prognose)],[arith_mittel_neutral,dates.num2date(datum_prognose)]])                
+    result.append([[prognose_buy,datum_buy],[prognose_sell,datum_sell],[prognose_neutral,datum_neutral],[arith_mittel_buy,datum_prognose],[arith_mittel_sell,datum_prognose],[arith_mittel_neutral,datum_prognose]])                
     return result
     
     

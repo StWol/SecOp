@@ -19,7 +19,7 @@ try:
     conn = MySQLdb.connect (host="141.62.65.151",
                             user = "stan",
                             passwd = "money!",
-                            db = "secop")
+                            db = "secop_web")
                       
     print "Mit secop verbunden"
                             
@@ -186,15 +186,26 @@ def get_mittelwert(liste):
 
 
 cp=input("Für welches Unternehmen?\n")
-sql2 = """SELECT avg, zieldatum FROM analyst_avg_2 WHERE unternehmen = %d  """%(cp)
-sql3 = """SELECT neues_kursziel, zieldatum, analyst, avg FROM analyst_avg_2 WHERE unternehmen = %d AND neues_kursziel >0 AND avg_datum<(SELECT CURDATE()) ORDER BY avg_datum, zieldatum """%(cp)
 
-sql = "SELECT close , `datum` FROM kursdaten WHERE unternehmen =%d ORDER BY `datum`"%(cp)
+sql3 = """SELECT `new_price`, `target_date`, `analyst_id`, `avg` 
+            FROM analyst_avg_2  
+            WHERE `company_id`= %d 
+            AND `new_price`>0 
+            AND `avg_date`<(SELECT CURDATE()) 
+            ORDER BY `avg_date`, `target_date`"""%(cp)    
+    
+sql = """SELECT `closing_price`, `date` 
+        FROM secop_quote 
+        WHERE `company_id`=%d 
+        ORDER BY `date`"""%(cp)
 
-sql4 = """SELECT neues_kursziel, zieldatum, analyst FROM prognose
- WHERE unternehmen = %d
- AND `zieldatum`>(SELECT CURDATE()) AND neues_kursziel >0
- ORDER BY zieldatum"""%(cp)
+sql4 = """SELECT `new_price`, `target_date`, `analyst_id`
+        FROM secop_prediction
+        WHERE `company_id`= %d
+        AND `target_date`>(SELECT CURDATE()) 
+        AND `new_price`>0
+        ORDER BY `target_date`"""%(cp)
+            
 
 predictions_mittel_dict = {}
 predictions_varianz_dict={}
